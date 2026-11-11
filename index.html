@@ -526,7 +526,12 @@ function rosterApply(){Object.keys(RAM).forEach(k=>delete RAM[k]);Object.keys(MK
  BANKS.length=0;(ROSTER.banks||[]).forEach(b=>{if(b&&String(b.name||"").trim()&&String(b.acct||"").trim())BANKS.push({id:String(b.id),name:String(b.name).trim(),acct:String(b.acct).trim(),branch:String(b.branch||"").trim()})});
  if(typeof S!=="undefined"&&S.ram&&S.ram!=="__o"&&!RAM[S.ram]){const k=Object.keys(RAM)[0];if(k){S.ram=k;Object.assign(S,RAM[k]);if(!S.mkSet)S.p_mkt=MKN[k]}else S.ram="__o"}}
 function rosterSet(r){if(!r||!Array.isArray(r.mkt)||!Array.isArray(r.app))return false;if(!Array.isArray(r.banks))r.banks=BANKS_DEF.map(x=>({...x}));const ch=JSON.stringify(r)!==JSON.stringify(ROSTER);ROSTER=r;try{localStorage.setItem("uwn_roster",JSON.stringify(r))}catch(e){}if(ch){rosterApply();if(AUTH.user&&typeof form=="function"&&typeof render=="function"){const ae=document.activeElement;if(!(ae&&F.contains(ae)&&/INPUT|TEXTAREA/.test(ae.tagName))){form();render()}}}return true}
-const apiPost=async(action,o)=>{if(typeof DIR_API==="undefined"||!DIR_API)return null;try{const r=await fetch(DIR_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({action,key:DIR_KEY},o))});return await r.json()}catch(e){return null}};
+const uwnPost=async body=>{const safe=/^(list|session|uapublic|rosterget|adminusers|adminlog)$/.test(body.action),n=safe?2:1;
+ for(let i=0;i<n;i++){const ac=safe&&typeof AbortController!=="undefined"?new AbortController():null,tm=ac?setTimeout(()=>ac.abort(),30000):0;
+  try{const r=await fetch(DIR_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body),signal:ac?ac.signal:undefined});const j=await r.json();clearTimeout(tm);return j}
+  catch(e){clearTimeout(tm);if(i<n-1)await new Promise(r=>setTimeout(r,1500))}}
+ return null};
+const apiPost=async(action,o)=>{if(typeof DIR_API==="undefined"||!DIR_API)return null;return uwnPost(Object.assign({action,key:DIR_KEY},o))};
 async function rosterLoad(){if(!AUTH.tok)return;const r=await apiPost("rosterget",{token:AUTH.tok});if(r&&r.error==="auth"){if(AUTH.expire)AUTH.expire();return}if(r&&r.ok&&r.roster)rosterSet(r.roster)}
 rosterApply();
 const prForm=()=>{if(!hasRf())return"";const I2=(k,l)=>`<label>${l}<input data-k="${k}" value="${esc(S[k])}"></label>`,SEL=(k,l,o)=>`<label>${l}<select data-k="${k}">${OP(o,S[k])}</select></label>`;
@@ -1262,13 +1267,14 @@ const dirCount=()=>{const sm=F.querySelector("#dirBox summary");if(sm)sm.textCon
 const dirCache=()=>{try{localStorage.setItem(DIRC,JSON.stringify(SHARED))}catch(e){}};
 async function dirRemote(action,item){try{const r=await fetch(DIR_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,key:DIR_KEY,item,token:AUTH.tok||""})});const j=await r.json();if(j&&j.error==="auth"&&AUTH.expire)AUTH.expire();return !!(j&&j.ok)}catch(e){return false}}
 let dirLoadT=0;
+let DLR=0;
 async function dirLoad(force){if(!DIR_API||!AUTH.tok)return;const now=Date.now();if(!force&&now-dirLoadT<60000)return;dirLoadT=now;rosterLoad();
- try{const r=await fetch(DIR_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"list",key:DIR_KEY,token:AUTH.tok})}),j=await r.json();if(j&&j.error==="auth"){if(AUTH.expire)AUTH.expire();return}if(!j||!j.ok||!Array.isArray(j.items))throw 0;
+ try{const j=await uwnPost({action:"list",key:DIR_KEY,token:AUTH.tok});if(j&&j.error==="auth"){if(AUTH.expire)AUTH.expire();return}if(!j||!j.ok||!Array.isArray(j.items))throw 0;
   const m={};j.items.forEach(x=>{if(x&&x.org&&x.to)m[dk(x.org,x.branch||"")]={org:String(x.org),branch:String(x.branch||""),to:String(x.to),role:String(x.role||""),addr:String(x.addr||""),saved:String(x.saved||""),by:String(x.by||"")}});
   SHARED={items:m};dirCache();
   for(const k of Object.keys(DIR.items)){const it=DIR.items[k];if(await dirRemote("save",it)){SHARED.items[k]=it;delete DIR.items[k]}}
   dirPersist();dirCache();dirRefresh();dirCount();if(force)dirMsg("Shared directory refreshed.")}
- catch(e){if(force)dirMsg("Could not reach the shared directory.")}}
+ catch(e){if(force)dirMsg("Could not reach the shared directory.");else if(!DLR){DLR=1;setTimeout(()=>{DLR=0;dirLoadT=0;dirLoad()},6000)}}}
 const dirAuto=()=>{try{return localStorage.getItem(DIRA)!=="0"}catch(e){return true}};
 const dk=(o,b)=>String(o||"").trim().replace(/\s+/g," ").toUpperCase()+"||"+String(b||"").trim().replace(/\s+/g," ").toUpperCase();
 const dirMsg=t=>{const m=document.getElementById("msg");if(m)m.textContent=t};
@@ -1307,12 +1313,23 @@ function dirSave(silent){const o=String(S.org||"").trim(),to=String(S.to||"").tr
  if(DIR_API){if(!silent){dirMsg("Saving "+nm+" to the shared directory\u2026");const bb=dirBtn();if(bb)bb.classList.add("dirbusy")}dirRemote("save",it).then(ok=>{const bb=dirBtn();if(bb)bb.classList.remove("dirbusy");if(ok){SHARED.items[key]=it;delete DIR.items[key];dirPersist();dirCache();dirRefresh();dirCount();if(!silent){const t="Saved "+nm+" to the shared directory.";dirMsg(t);dirToast(t,"ok");dirBtnAnim()}}else if(!silent){const t="Could not reach the shared directory. Saved on this computer only; it will be sent next time the tool opens.";dirMsg(t);dirToast(t,"warn")}})}
  else if(!silent){const t="Saved "+nm+" to the directory.";dirMsg(t);dirToast(t,"ok");dirBtnAnim()}
  return true}
-function dirFill(x){const set=(k,v)=>{S[k]=v;const u=F.querySelector('[data-k="'+k+'"]');if(u)u.value=v};set("to",x.to);set("role",x.role);set("addr",x.addr);set("org",x.org);if(S.hasBr)set("branch",x.branch||S.branch);render()}
+let DFL=null;
+function dirFill(x){DFL={to:x.to,role:x.role,addr:x.addr};const set=(k,v)=>{S[k]=v;const u=F.querySelector('[data-k="'+k+'"]');if(u)u.value=v};set("to",x.to);set("role",x.role);set("addr",x.addr);set("org",x.org);if(S.hasBr)set("branch",x.branch||S.branch);render()}
 function dirTry(){const o=String(S.org||"").trim();if(!o||PHX.test(o))return;const br=S.hasBr?String(S.branch||"").trim():"";
  const hit=dirAll()[dk(o,br)];
  if(hit&&!(S.hasBr&&!br)){dirFill(hit);dirRefresh();dirMsg("Addressee filled in from the directory. Change it and press Save to directory to update.");return}
  if(!S.hasBr&&dirBranches(o).length&&!dirAll()[dk(o,"")]){S.hasBr=true;form();render();const u=F.querySelector('[data-k="branch"]');if(u)u.focus();dirMsg("This cooperative has saved branches. Choose or type the branch.");return}
  dirRefresh()}
+/* phones: keyboards do not always fire "change", so also fill when typing pauses or the field loses focus */
+let _dft=0;
+function dirAutoFill(){const o=String(S.org||"").trim();if(!o||PHX.test(o))return;const br=S.hasBr?String(S.branch||"").trim():"";if(S.hasBr&&!br)return;
+ const hit=dirAll()[dk(o,br)];if(!hit)return;
+ const ok=k=>{const v=String(S[k]||"").trim();return !v||PHX.test(v)||(DFL&&v===String(DFL[k]||"").trim())||v===String(hit[k]||"").trim()};
+ if(!(ok("to")&&ok("role")&&ok("addr")))return;
+ if(String(S.to||"").trim()===hit.to&&String(S.role||"").trim()===hit.role&&String(S.addr||"").trim()===hit.addr)return;
+ dirFill(hit);dirRefresh();dirMsg("Addressee filled in from the directory. Change it and press Save to directory to update.");dirToast("Addressee filled in from the directory.","ok")}
+F.addEventListener("input",e=>{const d=e.target.dataset||{};if(d.k=="org"||d.k=="branch"){clearTimeout(_dft);_dft=setTimeout(dirAutoFill,800)}});
+F.addEventListener("focusout",e=>{const d=e.target.dataset||{};if(d.k=="org"||d.k=="branch"){clearTimeout(_dft);_dft=setTimeout(dirAutoFill,200)}});
 F.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
  if(d.k=="hasBr"){form();render();if(S.hasBr){const u=F.querySelector('[data-k="branch"]');if(u)u.focus()}else dirTry();return}
  if(d.k=="org"||d.k=="branch")dirTry();
@@ -1422,7 +1439,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.96",date:"2026-11-10",cur:1,groups:[{k:"Changed",i:["Layout adapts to phones, tablets and small laptops."]}]},
+ {v:"3.0.96",date:"2026-11-10",cur:1,groups:[{k:"Changed",i:["Layout adapts to phones, tablets and small laptops.","Directory autofill also works on phones, and the shared directory retries if the connection drops.","Auto logout now happens only after 24 hours without activity, or when the browser is closed."]}]},
  {v:"3.0.94",date:"2026-11-10",groups:[{k:"Changed",i:["Security patch."]}]},
  {v:"3.0.93",date:"2026-11-10",groups:[{k:"Changed",i:["Security patch."]}]},
  {v:"3.0.92",date:"2026-11-10",groups:[{k:"Changed",i:["Signatories (Underwriting Analyst, Approved by, Cc) stay together when a letter runs onto page 2."]}]},
@@ -1555,7 +1572,7 @@ const CHANGELOG=[
  function unlock(){document.body.classList.remove("lk");shell.forEach(e=>e&&(e.inert=false));wn.textContent=first(AUTH.user);ob.title="Logged in as "+AUTH.user+" \u2013 click to log out";ob.hidden=false;pb.hidden=false}
  if(AUTH.user)unlock();else lock();
  function welcome(){const sp=$("spOv");$("spImg").src=$("lgImg").src;$("spHi").textContent="Welcome, "+first(AUTH.user);const rm=matchMedia("(prefers-reduced-motion:reduce)").matches;let done=false;const end=()=>{if(done)return;done=true;sp.classList.add("out");setTimeout(()=>sp.classList.remove("on","out"),rm?0:500)};sp.classList.remove("out");sp.classList.add("on");sp.onclick=end;setTimeout(end,rm?1200:3300)}
- const pwRemote=async(action,o)=>{if(!DIR_API)return null;try{const r=await fetch(DIR_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({action,key:DIR_KEY},o))});return await r.json()}catch(e){return null}};
+ const pwRemote=async(action,o)=>{if(!DIR_API)return null;return uwnPost(Object.assign({action,key:DIR_KEY},o))};
  /* ===== v3.0.87: secure login (checked by the Google Sheet script) ===== */
  const proofOf=async(u,p)=>{if(!(window.crypto&&crypto.subtle))throw new Error("nocrypto");const en=new TextEncoder(),k=await crypto.subtle.importKey("raw",en.encode(String(p).normalize("NFKC")),"PBKDF2",false,["deriveBits"]),bits=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:en.encode("uwn2|"+u),iterations:600000},k,256);return Array.from(new Uint8Array(bits),x=>x.toString(16).padStart(2,"0")).join("")};
  const COMMON=["password","passw0rd","qwerty","123456","abc123","iloveyou","admin","welcome","letmein","monkey","dragon","cisp","ficco","underwriting","coop","philippines"];
@@ -1580,12 +1597,20 @@ const CHANGELOG=[
  function uaSync(names){const n=names.map(x=>String(x||"").trim()).filter(Boolean);if(!n.length)return;UA.length=0;UA.push(...n);try{localStorage.setItem("uwn_ua",JSON.stringify(UA))}catch(x){}
   const fill=(sel,ph)=>{const v=sel.value;sel.textContent="";sel.append(Object.assign(document.createElement("option"),{value:"",textContent:ph}),...UA.map(m=>Object.assign(document.createElement("option"),{value:m,textContent:m})));if(UA.includes(v))sel.value=v};
   fill(us,"Select your name");fill($("adUser"),"Select a UA")}
- const sessChk=async()=>{if(!AUTH.user||!AUTH.tok||document.hidden)return;const r=await pwRemote("session",{token:AUTH.tok});if(!r||!AUTH.user)return;if(!r.ok||r.user!==AUTH.user){const k=r.error==="kicked",g=r.error==="removed";try{pwRemote("logout",{token:AUTH.tok})}catch(x){}expire(k?"An administrator logged you out. Please log in again.":g?"Your account was removed. Please contact the administrator.":"Your session ended. Please log in again.",!(k||g))}};
+ const sessChk=async()=>{if(AUTH.user&&idleDue()){idleOut();return}if(!AUTH.user||!AUTH.tok||document.hidden)return;const r=await pwRemote("session",{token:AUTH.tok,poll:true});if(!r||!AUTH.user)return;if(!r.ok||r.user!==AUTH.user){const k=r.error==="kicked",g=r.error==="removed";try{pwRemote("logout",{token:AUTH.tok})}catch(x){}expire(k?"An administrator logged you out. Please log in again.":g?"Your account was removed. Please contact the administrator.":"Your session ended. Please log in again.",!(k||g))}};
  setInterval(sessChk,30000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)sessChk()});
  pwRemote("uapublic",{}).then(r=>{if(r&&r.ok&&Array.isArray(r.users)&&r.users.length)uaSync(r.users)});
  window.uaSync=uaSync;
- const idleReset=()=>{clearTimeout(idleT);if(!AUTH.user)return;idleT=setTimeout(()=>{if(!AUTH.user)return;try{pwRemote("logout",{token:AUTH.tok})}catch(x){}expire("You were logged out after 30 minutes without activity. Please log in again.",true)},1800000)};
- ["pointerdown","keydown","wheel","touchstart","scroll"].forEach(ev=>document.addEventListener(ev,()=>{if(AUTH.user)idleReset()},{passive:true,capture:true}));
+ /* auto log out: only after 24 hours without activity (checked by clock, so a sleeping PC counts), or when the browser is closed */
+ const IDLE_MS=86400000,IDLE_MSG="You were logged out after 24 hours without activity. Please log in again.";
+ const actGet=()=>{try{return Number(sessionStorage.getItem("uwn_act")||0)}catch(x){return 0}};
+ const actSet=()=>{try{sessionStorage.setItem("uwn_act",String(Date.now()))}catch(x){}};
+ const idleDue=()=>{const a=actGet();return !!a&&Date.now()-a>IDLE_MS};
+ const idleOut=()=>{if(!AUTH.user)return;try{pwRemote("logout",{token:AUTH.tok})}catch(x){}expire(IDLE_MSG,true)};
+ let lastPing=0;
+ const idleReset=()=>{clearTimeout(idleT);if(!AUTH.user)return;const n=Date.now();if(n-actGet()>15000)actSet();idleT=setTimeout(()=>{if(AUTH.user)idleOut()},IDLE_MS);if(n-lastPing>1800000){lastPing=n;pwRemote("session",{token:AUTH.tok})}};
+ ["pointerdown","keydown","wheel","touchstart","scroll"].forEach(ev=>document.addEventListener(ev,()=>{if(AUTH.user){if(idleDue()){idleOut();return}idleReset()}},{passive:true,capture:true}));
+ if(AUTH.user&&AUTH.pending&&idleDue())expire(IDLE_MSG,true);
  if(AUTH.user&&AUTH.pending){AUTH.pending=false;pwRemote("session",{token:AUTH.tok}).then(r=>{if(r&&r.ok&&r.user===AUTH.user){idleReset();if(typeof dirLoad==="function")dirLoad(true);if(r.temp)pwForce("")}else expire(r?"Your session ended. Please log in again.":"Cannot reach the server. Please check your connection and log in again.")})}
  let chk=false;
  const go=async()=>{
@@ -1598,7 +1623,7 @@ const CHANGELOG=[
   if(res==="ok"){
    AUTH.user=u;try{sessionStorage.setItem(AUTH.key,u+"|"+AUTH.tok)}catch(x){}
    S.sig=AUTH.user+"|Underwriting Analyst";S.uaM=false;
-   const typed=pw.value;pw.value="";er.textContent="";unlock();form();render();const same=lastUser===u;lastUser=null;if(!same)welcome();idleReset();if(typeof dirLoad==="function")dirLoad(true);
+   const typed=pw.value;pw.value="";er.textContent="";unlock();form();render();const same=lastUser===u;lastUser=null;if(!same)welcome();actSet();idleReset();if(typeof dirLoad==="function")dirLoad(true);
    const dl=same?200:(matchMedia("(prefers-reduced-motion:reduce)").matches?1300:3400);
    if(TEMP){TEMP=false;setTimeout(()=>pwForce(typed),dl)}else if(typed.length<12)setTimeout(()=>pwNudge(typed),dl)
   }else{er.textContent=res==="locked"?"Too many wrong attempts. Try again in 10 minutes.":res==="offline"?"Cannot reach the server. Check your internet connection and try again.":res==="reset"?"Your password needs to be reset. Please ask the administrator.":res==="nocrypto"?"This browser cannot do a secure login. Open the site using its https:// address or use an up-to-date browser.":"Incorrect username or password.";pw.select()}
@@ -1677,7 +1702,7 @@ const CHANGELOG=[
  function adUsers(){const t=$("adUT");if(!ADU.length){t.innerHTML="<tbody><tr><td>No UAs found.</td></tr></tbody>";return}
   t.innerHTML="<thead><tr><th>UA</th><th>Last login</th><th>Password</th><th>Session</th><th></th></tr></thead><tbody>"+ADU.map((u,i)=>`<tr><td><b>${esc(u.name)}</b></td><td data-l="Last login">${u.lastLogin?esc(fD(u.lastLogin)):'<span style="color:var(--mu)">Never</span>'}</td><td data-l="Password">${pwSt(u)}</td><td data-l="Session">${u.online?'<span class="ad-on"></span>Logged in':'<span class="ad-off"></span>Not logged in'}</td><td><button type="button" class="b" data-adu="rst:${i}">Reset password</button><button type="button" class="b" data-adu="kick:${i}"${u.online?"":" disabled"}>Force log out</button><button type="button" class="b" data-adu="del:${i}">Remove</button></td></tr>`).join("")+"</tbody>"}
  async function adLoad(){aSay("");const bx=ao.querySelector(".lg-box");if(bx)bx.scrollTop=0;const r=await pwRemote("adminusers",{adminToken:aH});
-  if(r&&r.ok&&Array.isArray(r.users)){ADU=r.users;adUsers();uaSync(ADU.map(u=>u.name))}else{$("adUT").innerHTML="<tbody><tr><td>"+esc(adErr(r))+"</td></tr></tbody>"}
+  if(r&&r.ok&&Array.isArray(r.users)){ADU=r.users;adUsers();uaSync(ADU.map(u=>u.name))}else{$("adUT").innerHTML="<tbody><tr><td>"+esc(adErr(r)+(r?"":" Close and open the Administrator window to try again."))+"</td></tr></tbody>"}
   const q=await pwRemote("rosterget",{adminToken:aH});if(q&&q.ok&&q.roster){rosterSet(q.roster)}
   WK=JSON.parse(JSON.stringify(ROSTER));WK.banks=WK.banks||[];adRoster()}
  const adIn=(arr,i,f,l,ph)=>`<label>${l}<input data-adr="${arr}:${i}:${f}" value="${esc(WK[arr][i][f]||"")}" placeholder="${ph||""}"></label>`;
@@ -1689,7 +1714,7 @@ const CHANGELOG=[
   $("adLgT").innerHTML=rows.length?"<thead><tr><th>When</th><th>UA</th><th>Action</th><th>Entry</th></tr></thead><tbody>"+rows.map(e=>{const k=String(e.action||"").toLowerCase();return`<tr><td data-l="When">${esc(fD(e.t))}</td><td data-l="UA">${esc(e.user||"")}</td><td data-l="Action">${k==="save"?pill("Saved","ok"):k==="delete"?pill("Deleted","bad"):pill(e.action||"","warn")}</td><td data-l="Entry">${esc(e.item||"")}</td></tr>`}).join("")+"</tbody>":"<tbody><tr><td>No activity found.</td></tr></tbody>"}
  async function adLog(){$("adLgT").innerHTML="<tbody><tr><td>Loading\u2026</td></tr></tbody>";const r=await pwRemote("adminlog",{adminToken:aH,limit:300});
   if(r&&r.ok&&Array.isArray(r.log)){LOG=r.log;const sel=$("adLgU"),v=sel.value;sel.textContent="";sel.append(Object.assign(document.createElement("option"),{value:"",textContent:"All"}),...[...new Set(LOG.map(e=>e.user).filter(Boolean))].sort().map(n=>Object.assign(document.createElement("option"),{value:n,textContent:n})));sel.value=v;adLogShow()}
-  else $("adLgT").innerHTML="<tbody><tr><td>"+esc(adErr(r))+"</td></tr></tbody>"}
+  else $("adLgT").innerHTML="<tbody><tr><td>"+esc(adErr(r)+(r?"":" Tap Refresh to try again."))+"</td></tr></tbody>"}
  ao.addEventListener("click",e=>{const tb=e.target.closest("[data-adtab]");if(tb){const k=tb.dataset.adtab;$("adTabSel").value=k;ao.querySelectorAll("[data-adtab]").forEach(x=>x.classList.toggle("on",x===tb));ao.querySelectorAll("[data-adpane]").forEach(x=>x.hidden=x.dataset.adpane!==k);aSay("");if(k==="lg")adLog();return}
   const ub=e.target.closest("[data-adu]");if(ub){const[op,i]=ub.dataset.adu.split(":"),u=ADU[+i];if(!u||abz)return;
    if(op==="rst"){$("adRst").hidden=false;aU.value=u.name;aT.value="";aSay("");aT.focus();$("adRst").scrollIntoView({block:"nearest"});return}

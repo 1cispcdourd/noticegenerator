@@ -1270,13 +1270,18 @@ let dirLoadT=0;
 let DLR=0;
 async function dirLoad(force){if(!DIR_API||!AUTH.tok)return;const now=Date.now();if(!force&&now-dirLoadT<60000)return;dirLoadT=now;rosterLoad();
  try{const j=await uwnPost({action:"list",key:DIR_KEY,token:AUTH.tok});if(j&&j.error==="auth"){if(AUTH.expire)AUTH.expire();return}if(!j||!j.ok||!Array.isArray(j.items))throw 0;
-  const m={};j.items.forEach(x=>{if(x&&x.org&&x.to)m[dk(x.org,x.branch||"")]={org:String(x.org),branch:String(x.branch||""),to:String(x.to),role:String(x.role||""),addr:String(x.addr||""),saved:String(x.saved||""),by:String(x.by||"")}});
+  const m={};j.items.forEach(x=>{if(x&&x.org&&x.to)m[dk(x.org,x.branch||"")]={org:String(x.org),branch:brFix(x.branch),to:String(x.to),role:String(x.role||""),addr:String(x.addr||""),saved:String(x.saved||""),by:String(x.by||"")}});
   SHARED={items:m};dirCache();
   for(const k of Object.keys(DIR.items)){const it=DIR.items[k];if(await dirRemote("save",it)){SHARED.items[k]=it;delete DIR.items[k]}}
   dirPersist();dirCache();dirRefresh();dirCount();if(force)dirMsg("Shared directory refreshed.")}
  catch(e){if(force)dirMsg("Could not reach the shared directory.");else if(!DLR){DLR=1;setTimeout(()=>{DLR=0;dirLoadT=0;dirLoad()},6000)}}}
 const dirAuto=()=>{try{return localStorage.getItem(DIRA)!=="0"}catch(e){return true}};
-const dk=(o,b)=>String(o||"").trim().replace(/\s+/g," ").toUpperCase()+"||"+String(b||"").trim().replace(/\s+/g," ").toUpperCase();
+/* a branch name always ends with the word Branch ("Gaisano" -> "Gaisano Branch"), unless it already says Office, Unit, Extension, etc. */
+function brFix(b){let v=String(b||"").trim().replace(/\s+/g," ");if(!v)return"";const up=v===v.toUpperCase();
+ if(!/\b(branch|office|unit|extension|satellite|center|centre|outlet|hq|headquarters)\b/i.test(v))return v+(up?" BRANCH":" Branch");
+ return v.replace(/\bbranch$/i,up?"BRANCH":"Branch")}
+function brField(t){const v=brFix(t.value);if(v&&v!==t.value){t.value=v;S.branch=v;render()}}
+const dk=(o,b)=>String(o||"").trim().replace(/\s+/g," ").toUpperCase()+"||"+brFix(b).toUpperCase();
 const dirMsg=t=>{const m=document.getElementById("msg");if(m)m.textContent=t};
 const dirAll=()=>Object.assign({},SHARED.items,DIR.items);
 const dirSorted=()=>Object.keys(dirAll()).sort((a,b)=>a.localeCompare(b));
@@ -1307,14 +1312,14 @@ function dirSave(silent){const o=String(S.org||"").trim(),to=String(S.to||"").tr
   if(!to||PHX.test(to))mi.push(["to","Name"]);if(!ro)mi.push(["role","Position"]);if(!o||PHX.test(o))mi.push(["org","Organization"]);if(S.hasBr&&!b0)mi.push(["branch","Branch name"]);if(!ad||PHX.test(ad))mi.push(["addr","Address"]);
   if(mi.length){const t="Not saved. Please fill in: "+mi.map(x=>x[1]).join(", ")+".";dirMsg(t);dirToast(t,"err");dirBad(mi.map(x=>x[0]));return false}}
  if(!o||!to||!ad||PHX.test(o+to+ad))return false;
- const br=S.hasBr?String(S.branch||"").trim():"";if(S.hasBr&&!br)return false;
+ const br=S.hasBr?brFix(S.branch):"";if(S.hasBr&&!br)return false;if(S.hasBr&&br!==String(S.branch||"")){S.branch=br;const bu=F.querySelector('[data-k="branch"]');if(bu)bu.value=br}
  const key=dk(o,br),it={org:o,branch:br,to,role:String(S.role||"").trim(),addr:ad,saved:new Date().toISOString().slice(0,10),by:AUTH.user||""},nm="\u201C"+o+(br?" \u2013 "+br:"")+"\u201D";
  DIR.items[key]=it;if(!dirPersist())return false;dirRefresh();dirCount();
  if(DIR_API){if(!silent){dirMsg("Saving "+nm+" to the shared directory\u2026");const bb=dirBtn();if(bb)bb.classList.add("dirbusy")}dirRemote("save",it).then(ok=>{const bb=dirBtn();if(bb)bb.classList.remove("dirbusy");if(ok){SHARED.items[key]=it;delete DIR.items[key];dirPersist();dirCache();dirRefresh();dirCount();if(!silent){const t="Saved "+nm+" to the shared directory.";dirMsg(t);dirToast(t,"ok");dirBtnAnim()}}else if(!silent){const t="Could not reach the shared directory. Saved on this computer only; it will be sent next time the tool opens.";dirMsg(t);dirToast(t,"warn")}})}
  else if(!silent){const t="Saved "+nm+" to the directory.";dirMsg(t);dirToast(t,"ok");dirBtnAnim()}
  return true}
 let DFL=null;
-function dirFill(x){DFL={to:x.to,role:x.role,addr:x.addr};const set=(k,v)=>{S[k]=v;const u=F.querySelector('[data-k="'+k+'"]');if(u)u.value=v};set("to",x.to);set("role",x.role);set("addr",x.addr);set("org",x.org);if(S.hasBr)set("branch",x.branch||S.branch);render()}
+function dirFill(x){DFL={to:x.to,role:x.role,addr:x.addr};const set=(k,v)=>{S[k]=v;const u=F.querySelector('[data-k="'+k+'"]');if(u)u.value=v};set("to",x.to);set("role",x.role);set("addr",x.addr);set("org",x.org);if(S.hasBr)set("branch",brFix(x.branch||S.branch));render()}
 function dirTry(){const o=String(S.org||"").trim();if(!o||PHX.test(o))return;const br=S.hasBr?String(S.branch||"").trim():"";
  const hit=dirAll()[dk(o,br)];
  if(hit&&!(S.hasBr&&!br)){dirFill(hit);dirRefresh();dirMsg("Addressee filled in from the directory. Change it and press Save to directory to update.");return}
@@ -1329,12 +1334,12 @@ function dirAutoFill(){const o=String(S.org||"").trim();if(!o||PHX.test(o))retur
  if(String(S.to||"").trim()===hit.to&&String(S.role||"").trim()===hit.role&&String(S.addr||"").trim()===hit.addr)return;
  dirFill(hit);dirRefresh();dirMsg("Addressee filled in from the directory. Change it and press Save to directory to update.");dirToast("Addressee filled in from the directory.","ok")}
 F.addEventListener("input",e=>{const d=e.target.dataset||{};if(d.k=="org"||d.k=="branch"){clearTimeout(_dft);_dft=setTimeout(dirAutoFill,800)}});
-F.addEventListener("focusout",e=>{const d=e.target.dataset||{};if(d.k=="org"||d.k=="branch"){clearTimeout(_dft);_dft=setTimeout(dirAutoFill,200)}});
+F.addEventListener("focusout",e=>{const d=e.target.dataset||{};if(d.k=="org"||d.k=="branch"){if(d.k=="branch")brField(e.target);clearTimeout(_dft);_dft=setTimeout(dirAutoFill,200)}});
 F.addEventListener("change",e=>{const t=e.target,d=t.dataset||{};
  if(d.k=="hasBr"){form();render();if(S.hasBr){const u=F.querySelector('[data-k="branch"]');if(u)u.focus()}else dirTry();return}
- if(d.k=="org"||d.k=="branch")dirTry();
+ if(d.k=="org"||d.k=="branch"){if(d.k=="branch")brField(t);dirTry()}
  else if(t.id=="dirAuto"){try{localStorage.setItem(DIRA,t.checked?"1":"0")}catch(x){}}
- else if(t.id=="dirFile"&&t.files&&t.files[0]){const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result),it=j&&j.items;if(!it||typeof it!="object")throw 0;let n=0;Object.values(it).forEach(x=>{if(x&&x.org&&x.to){DIR.items[dk(x.org,x.branch||"")]={org:String(x.org),branch:String(x.branch||""),to:String(x.to),role:String(x.role||""),addr:String(x.addr||""),saved:String(x.saved||"")};n++}});dirPersist();dirRefresh();const s=F.querySelector("#dirBox summary");if(s)s.textContent="Cooperative directory ("+Object.keys(dirAll()).length+")";dirMsg("Imported "+n+" entr"+(n==1?"y":"ies")+" into the directory.")}catch(x){dirMsg("That file is not a valid directory backup.")}};r.readAsText(t.files[0]);t.value=""}});
+ else if(t.id=="dirFile"&&t.files&&t.files[0]){const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result),it=j&&j.items;if(!it||typeof it!="object")throw 0;let n=0;Object.values(it).forEach(x=>{if(x&&x.org&&x.to){DIR.items[dk(x.org,x.branch||"")]={org:String(x.org),branch:brFix(x.branch),to:String(x.to),role:String(x.role||""),addr:String(x.addr||""),saved:String(x.saved||"")};n++}});dirPersist();dirRefresh();const s=F.querySelector("#dirBox summary");if(s)s.textContent="Cooperative directory ("+Object.keys(dirAll()).length+")";dirMsg("Imported "+n+" entr"+(n==1?"y":"ies")+" into the directory.")}catch(x){dirMsg("That file is not a valid directory backup.")}};r.readAsText(t.files[0]);t.value=""}});
 F.addEventListener("toggle",e=>{if(e.target&&e.target.id=="dirBox")DIROPEN=e.target.open},true);
 F.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-dir]");
  if(b){const a=b.dataset.dir;
@@ -1346,7 +1351,7 @@ F.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data
   return}
  const id=e.target.id;if(id=="dl"||id=="pr"||id=="pl"||id=="dx"){if(dirAuto())dirSave(true)}},true);
 
-try{if(!DIR_API)fetch("directory.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{const it=j&&j.items;if(!it||typeof it!="object")return;Object.values(it).forEach(x=>{if(x&&x.org&&x.to)SHARED.items[dk(x.org,x.branch||"")]={org:String(x.org),branch:String(x.branch||""),to:String(x.to),role:String(x.role||""),addr:String(x.addr||""),saved:String(x.saved||"")}});dirRefresh();const sm=F.querySelector("#dirBox summary");if(sm)sm.textContent="Cooperative directory ("+Object.keys(dirAll()).length+")"}).catch(()=>{})}catch(e){}
+try{if(!DIR_API)fetch("directory.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(j=>{const it=j&&j.items;if(!it||typeof it!="object")return;Object.values(it).forEach(x=>{if(x&&x.org&&x.to)SHARED.items[dk(x.org,x.branch||"")]={org:String(x.org),branch:brFix(x.branch),to:String(x.to),role:String(x.role||""),addr:String(x.addr||""),saved:String(x.saved||"")}});dirRefresh();const sm=F.querySelector("#dirBox summary");if(sm)sm.textContent="Cooperative directory ("+Object.keys(dirAll()).length+")"}).catch(()=>{})}catch(e){}
 
 dirLoad(true);document.addEventListener("visibilitychange",()=>{if(!document.hidden)dirLoad(false)});
 form();render();
@@ -1439,7 +1444,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.96",date:"2026-11-10",cur:1,groups:[{k:"Changed",i:["Layout adapts to phones, tablets and small laptops.","Directory autofill also works on phones, and the shared directory retries if the connection drops.","Auto logout now happens only after 24 hours without activity, or when the browser is closed."]}]},
+ {v:"3.0.96",date:"2026-11-10",cur:1,groups:[{k:"Changed",i:["Layout adapts to phones, tablets and small laptops.","Directory autofill also works on phones, and the shared directory retries if the connection drops.","Auto logout now happens only after 24 hours without activity, or when the browser is closed.","Branch names automatically end with the word Branch (Gaisano becomes Gaisano Branch)."]}]},
  {v:"3.0.94",date:"2026-11-10",groups:[{k:"Changed",i:["Security patch."]}]},
  {v:"3.0.93",date:"2026-11-10",groups:[{k:"Changed",i:["Security patch."]}]},
  {v:"3.0.92",date:"2026-11-10",groups:[{k:"Changed",i:["Signatories (Underwriting Analyst, Approved by, Cc) stay together when a letter runs onto page 2."]}]},
@@ -1734,7 +1739,7 @@ const CHANGELOG=[
   if(!m.length){aSay("Keep at least one marketing name.");return}
   const bk=(WK.banks||[]).filter(x=>String(x.name||"").trim()||String(x.acct||"").trim());
   if(bk.some(x=>!String(x.name||"").trim()||!String(x.acct||"").trim())){aSay("Every bank account needs a bank name and an account number.");return}
-  const clean={mkt:m.map(x=>{const nm=String(x.name).trim(),role=String(x.role||"").trim()||"Regional Area Manager",o=ROSTER.mkt.find(y=>String(y.id)===String(x.id))||{};return{id:String(x.id),name:nm,cname:o.name===nm?(o.cname||""):"",no:String(x.no).trim(),role,c2:String(x.c2||"").trim(),c2r:String(x.c2r||"").trim(),cc:o.name===nm&&String(o.role||"")===role?(o.cc||""):""}}),app:p.map(x=>({name:String(x.name).trim().replace(/\s+/g," ").toUpperCase(),position:String(x.position).trim()})),banks:bk.map(x=>({id:String(x.id),name:String(x.name).trim(),acct:String(x.acct).trim(),branch:String(x.branch||"").trim()}))};
+  const clean={mkt:m.map(x=>{const nm=String(x.name).trim(),role=String(x.role||"").trim()||"Regional Area Manager",o=ROSTER.mkt.find(y=>String(y.id)===String(x.id))||{};return{id:String(x.id),name:nm,cname:o.name===nm?(o.cname||""):"",no:String(x.no).trim(),role,c2:String(x.c2||"").trim(),c2r:String(x.c2r||"").trim(),cc:o.name===nm&&String(o.role||"")===role?(o.cc||""):""}}),app:p.map(x=>({name:String(x.name).trim().replace(/\s+/g," ").toUpperCase(),position:String(x.position).trim()})),banks:bk.map(x=>({id:String(x.id),name:String(x.name).trim(),acct:String(x.acct).trim(),branch:brFix(x.branch).trim()}))};
   abz=true;aSay("Saving\u2026");const r=await pwRemote("rostersave",{adminToken:aH,roster:clean});abz=false;
   if(r&&r.ok){rosterSet(clean);WK=JSON.parse(JSON.stringify(ROSTER));adRoster();aSay("Saved. UAs will see the changes within a minute.",1)}else aSay(adErr(r))}
  const adNameOk=n=>/^[A-Z\u00D1][A-Z\u00D1.' \-]{4,60}$/.test(n);

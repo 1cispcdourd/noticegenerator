@@ -1700,7 +1700,7 @@ const CHANGELOG=[
   if(r&&r.ok&&r.adminToken){aH=r.adminToken;aP=np;$("adN1").value=$("adN2").value="";aSay("Administrator password changed.",1)}else aSay(r&&r.error==="same"?"The new password must be different from the current one.":adErr(r))});
 
  /* ===== v3.0.96: administrator panel (UAs, marketing, approvers, activity log) ===== */
- const fD=x=>{if(!x)return"";const d=new Date(x);return isNaN(d)?String(x):d.toLocaleString("en-PH",{year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})};
+ const fD=x=>{if(!x)return"";const d=new Date(x);if(isNaN(d))return String(x);const o={year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"};try{return d.toLocaleString("en-PH",o)}catch(e){try{return d.toLocaleString(undefined,o)}catch(e2){return d.toISOString().slice(0,16).replace("T"," ")}}};
  let ADU=[],WK={mkt:[],app:[]},LOG=[];
  const pill=(t,k)=>`<span class="ad-p ${k}">${esc(t)}</span>`;
  const pwSt=u=>u.locked?pill("Locked","bad"):u.reset?pill("Reset required","warn"):u.pwSet===false?pill("No password","bad"):u.temp?pill("Temporary \u2013 must change","warn"):pill("Active","ok")+(u.pwChanged?`<div style="color:var(--mu);margin-top:2px">changed ${esc(fD(u.pwChanged))}</div>`:"");
@@ -1717,10 +1717,16 @@ const CHANGELOG=[
   $("adBk").innerHTML=(WK.banks||[]).map((x,i)=>`<div class="row"><div style="display:flex;justify-content:space-between;align-items:center"><b>Bank account ${i+1}</b><button type="button" class="b" data-adrd="banks:${i}">Remove</button></div><div class="g3">${adIn("banks",i,"name","Bank name","China Bank Corporation")}${adIn("banks",i,"acct","Account number","137 - 90000406 - 6")}${adIn("banks",i,"branch","Branch (optional)","Gaisano Branch")}</div></div>`).join("")||'<p style="color:var(--mu);font-size:12px">No bank accounts yet.</p>'}
  function adLogShow(){const u=$("adLgU").value,a=$("adLgA").value,rows=LOG.filter(e=>(!u||e.user===u)&&(!a||String(e.action).toLowerCase()===a));
   $("adLgT").innerHTML=rows.length?"<thead><tr><th>When</th><th>UA</th><th>Action</th><th>Entry</th></tr></thead><tbody>"+rows.map(e=>{const k=String(e.action||"").toLowerCase();return`<tr><td data-l="When">${esc(fD(e.t))}</td><td data-l="UA">${esc(e.user||"")}</td><td data-l="Action">${k==="save"?pill("Saved","ok"):k==="delete"?pill("Deleted","bad"):pill(e.action||"","warn")}</td><td data-l="Entry">${esc(e.item||"")}</td></tr>`}).join("")+"</tbody>":"<tbody><tr><td>No activity found.</td></tr></tbody>"}
- async function adLog(){$("adLgT").innerHTML="<tbody><tr><td>Loading\u2026</td></tr></tbody>";const r=await pwRemote("adminlog",{adminToken:aH,limit:300});
-  if(r&&r.ok&&Array.isArray(r.log)){LOG=r.log;const sel=$("adLgU"),v=sel.value;sel.textContent="";sel.append(Object.assign(document.createElement("option"),{value:"",textContent:"All"}),...[...new Set(LOG.map(e=>e.user).filter(Boolean))].sort().map(n=>Object.assign(document.createElement("option"),{value:n,textContent:n})));sel.value=v;adLogShow()}
-  else $("adLgT").innerHTML="<tbody><tr><td>"+esc(adErr(r)+(r?"":" Tap Refresh to try again."))+"</td></tr></tbody>"}
- ao.addEventListener("click",e=>{const tb=e.target.closest("[data-adtab]");if(tb){const k=tb.dataset.adtab;$("adTabSel").value=k;ao.querySelectorAll("[data-adtab]").forEach(x=>x.classList.toggle("on",x===tb));ao.querySelectorAll("[data-adpane]").forEach(x=>x.hidden=x.dataset.adpane!==k);aSay("");if(k==="lg")adLog();return}
+ let adLogN=0;
+ async function adLog(){const T=$("adLgT"),my=++adLogN;T.innerHTML="<tbody><tr><td>Loading\u2026</td></tr></tbody>";
+  let r=null;try{r=await pwRemote("adminlog",{adminToken:aH,limit:300})}catch(x){r=null}
+  if(my!==adLogN)return;
+  try{
+   if(r&&r.ok&&Array.isArray(r.log)){LOG=r.log;const sel=$("adLgU"),v=sel.value;sel.textContent="";sel.append(Object.assign(document.createElement("option"),{value:"",textContent:"All"}),...[...new Set(LOG.map(e=>e.user).filter(Boolean))].sort().map(n=>Object.assign(document.createElement("option"),{value:n,textContent:n})));sel.value=v;adLogShow()}
+   else T.innerHTML="<tbody><tr><td>"+esc(adErr(r)+(r?"":" Tap Refresh to try again."))+"</td></tr></tbody>"}
+  catch(x){T.innerHTML="<tbody><tr><td>"+esc("Could not show the activity log ("+(x&&x.message||x)+"). Tap Refresh to try again.")+"</td></tr></tbody>"}}
+ function adTab(k){$("adTabSel").value=k;ao.querySelectorAll("[data-adtab]").forEach(x=>x.classList.toggle("on",x.dataset.adtab===k));ao.querySelectorAll("[data-adpane]").forEach(x=>x.hidden=x.dataset.adpane!==k);aSay("");if(k==="lg")adLog()}
+ ao.addEventListener("click",e=>{const tb=e.target.closest("[data-adtab]");if(tb){adTab(tb.dataset.adtab);return}
   const ub=e.target.closest("[data-adu]");if(ub){const[op,i]=ub.dataset.adu.split(":"),u=ADU[+i];if(!u||abz)return;
    if(op==="rst"){$("adRst").hidden=false;aU.value=u.name;aT.value="";aSay("");aT.focus();$("adRst").scrollIntoView({block:"nearest"});return}
    if(op==="kick"){if(!confirm("Log out "+u.name+" now? Anything they have not saved will be lost."))return;abz=true;aSay("Saving\u2026");pwRemote("adminkick",{adminToken:aH,user:u.name}).then(r=>{abz=false;if(r&&r.ok){aSay(u.name+" was logged out.",1);adLoad()}else aSay(adErr(r))});return}
@@ -1729,7 +1735,7 @@ const CHANGELOG=[
   if(e.target.closest("[data-adsave]")){adSaveRoster();return}});
  ao.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.adr){const[a,i,f]=t.dataset.adr.split(":");if(WK[a]&&WK[a][+i])WK[a][+i][f]=t.value}});
  $("adMkAdd").addEventListener("click",()=>{const mx=Math.max(0,...WK.mkt.map(m=>parseInt(m.id)||0));WK.mkt.push({id:String(mx+1),name:"",cname:"",no:"",role:"Regional Area Manager",c2:"",c2r:"",cc:""});adRoster()});
- $("adTabSel").addEventListener("change",e=>{const b=ao.querySelector('[data-adtab="'+e.target.value+'"]');if(b)b.click()});
+ $("adTabSel").addEventListener("change",e=>adTab(e.target.value));
  $("adBkAdd").addEventListener("click",()=>{WK.banks=WK.banks||[];const mx=Math.max(0,...WK.banks.map(b=>parseInt(b.id)||0));WK.banks.push({id:String(mx+1),name:"",acct:"",branch:""});adRoster()});
  $("adApAdd").addEventListener("click",()=>{WK.app.push({name:"",position:""});adRoster()});
  $("adLgR").addEventListener("click",adLog);$("adLgU").addEventListener("change",adLogShow);$("adLgA").addEventListener("change",adLogShow);

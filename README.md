@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.122
+**Current version:** v3.0.126
 
 ## Features
 

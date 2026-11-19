@@ -1123,7 +1123,7 @@ function buildUP(){const c=upx(),I=c.cls=="I",rs=upRows(c),B=[],hs=x=>({x,b:1,sh
    {t:"grid",w:[10,13,11,11,12,11,11,10,11],rows:[[{x:"Reference "+upRtL(rt)+" No. "+String(m.ref||"").trim()+(m.rdate?" dated "+dt(m.rdate):""),cs:9,b:1,sh:1}],
     [hs("Loan Amount"),hs("Encumbrance"),hs("Sum Insured"),hs("Effective Date"),hs("New Expiry Date\n(Fully Paid)"),hs("Actual Loan Term"),hs("Premium Paid"),hs("Premium Due"),hs("Unused Premium")],
     [{x:mv(m.loan)},{x:mv(m.enc)},{x:mv(m.si)},{x:dt(m.eff)},{x:dt(m.exp)},{x:String(m.term||"")+(String(m.termD||"").trim()?"\n"+String(m.termD).trim():"")},{x:mv(m.paid)},{x:mv(m.due)},{x:money(u),b:1}],
-    [{x:"Total Unused Premium to be Refunded",cs:8,b:1},{x:money(u),b:1}]]})});
+    [{x:"Total Unused Premium to be Refunded",cs:8,b:1,al:"r"},{x:money(u),b:1}]]})});
  if(!I)B.push({t:"sum",title:"Summary of Net Unused Premium Refund",rows:rs.map((m,i)=>[String(i+1),money(upAmt(m))]),total:["Total Net Refund","\u20B1"+money(tot)]});
  B.push(Pb(mk(upEnd(c,tot))),Pb("We will be glad if you can attach this letter together with the remittance report."),Pb(`If we may assist you with anything else, please feel free to contact us through our ${c.mcr}, ${c.mc} at ${c.mcn}.`),Pb("Thank you for your patronage."));
  const to=[[S.to,1],[S.role],[orgFull()],[S.addr]];if(c.thruOn&&(String(c.thruN||"").trim()||String(c.thruT||"").trim())){to.push(["Thru:"]);if(String(c.thruN||"").trim())to.push([c.thruN]);if(String(c.thruT||"").trim())to.push([c.thruT])}
@@ -1569,7 +1569,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.129",date:"2026-11-19",cur:1,groups:[{k:"Fixed",i:["Unused Premium table: total row edge to edge, Encumbrance wraps."]}]},
+ {v:"3.0.129",date:"2026-11-19",cur:1,groups:[{k:"Fixed",i:["Unused Premium table: total row edge to edge, right-aligned, Encumbrance wraps."]}]},
  {v:"3.0.128",date:"2026-11-19",groups:[{k:"Fixed",i:["Print PR only no longer shows an empty first page."]}]},
  {v:"3.0.127",date:"2026-11-19",groups:[{k:"Fixed",i:["PR GP / NP table shows lines on the row labels."]}]},
  {v:"3.0.126",date:"2026-11-19",groups:[{k:"Fixed",i:["Unused Premium Refund checks the request form required fields."]}]},

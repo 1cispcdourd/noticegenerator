@@ -1120,10 +1120,10 @@ function buildUP(){const c=upx(),I=c.cls=="I",rs=upRows(c),B=[],hs=x=>({x,b:1,sh
    Pb("For your reference, below are the details of the members\u2019 insurance coverage and their respective unused premiums:"));
  rs.forEach((m,i)=>{const u=upAmt(m),rt=UPRT.includes(m.rt)?m.rt:"S.I.";
   B.push({t:"h",x:String.fromCharCode(65+i)+". UNUSED PREMIUM OF "+String(m.name||"").toUpperCase()},
-   {t:"grid",w:[11,11,11,11,12,12,11,10,11],rows:[[{x:"Reference "+upRtL(rt)+" No. "+String(m.ref||"").trim()+(m.rdate?" dated "+dt(m.rdate):""),cs:9,b:1,sh:1}],
+   {t:"grid",w:[10,13,11,11,12,11,11,10,11],rows:[[{x:"Reference "+upRtL(rt)+" No. "+String(m.ref||"").trim()+(m.rdate?" dated "+dt(m.rdate):""),cs:9,b:1,sh:1}],
     [hs("Loan Amount"),hs("Encumbrance"),hs("Sum Insured"),hs("Effective Date"),hs("New Expiry Date\n(Fully Paid)"),hs("Actual Loan Term"),hs("Premium Paid"),hs("Premium Due"),hs("Unused Premium")],
     [{x:mv(m.loan)},{x:mv(m.enc)},{x:mv(m.si)},{x:dt(m.eff)},{x:dt(m.exp)},{x:String(m.term||"")+(String(m.termD||"").trim()?"\n"+String(m.termD).trim():"")},{x:mv(m.paid)},{x:mv(m.due)},{x:money(u),b:1}],
-    [{x:"",cs:4,nb:1},{x:"Total Unused Premium to be Refunded",cs:4,b:1},{x:money(u),b:1}]]})});
+    [{x:"Total Unused Premium to be Refunded",cs:8,b:1},{x:money(u),b:1}]]})});
  if(!I)B.push({t:"sum",title:"Summary of Net Unused Premium Refund",rows:rs.map((m,i)=>[String(i+1),money(upAmt(m))]),total:["Total Net Refund","\u20B1"+money(tot)]});
  B.push(Pb(mk(upEnd(c,tot))),Pb("We will be glad if you can attach this letter together with the remittance report."),Pb(`If we may assist you with anything else, please feel free to contact us through our ${c.mcr}, ${c.mc} at ${c.mcn}.`),Pb("Thank you for your patronage."));
  const to=[[S.to,1],[S.role],[orgFull()],[S.addr]];if(c.thruOn&&(String(c.thruN||"").trim()||String(c.thruT||"").trim())){to.push(["Thru:"]);if(String(c.thruN||"").trim())to.push([c.thruN]);if(String(c.thruT||"").trim())to.push([c.thruT])}
@@ -1504,7 +1504,7 @@ const CLP={
  custom:{n:"Other plan (blank table)",re:"",H:["COVERAGE","SUM INSURED (Php)"],rows:[["Life Insurance Benefit",""]],st:[]}};
 function clNew(k){const p=CLP[k],o={plan:k,units:"I",title:p.title||"CONFIRMATION OF GROUP INSURANCE COVERAGE",re:p.re,grp:p.grp||"",lead:p.lead||1,H:p.H||[],rows:p.rows||[],ni:[],st:p.st.map(l=>({n:"",l})),note:p.note||"",nonum:!!p.nonum,sub:p.sub||[],sp:p.sp||3,intro:p.intro||CLI,per:p.per||"Please see attached list of insured members",pay:[{t:p.payt||"A.R Number",ref:"",date:"",amt:""}],ph:"Amount",peso:false,clc:p.clc||"Very truly yours,",clx:p.clx||CLX,thx:"Thank you for your valued patronage."};
  const c=JSON.parse(JSON.stringify(o));if(p.gb)Object.assign(c,gbRows("I"));return c}
-const gridHtml=b=>{const s=b.w.reduce((a,x)=>a+x,0);return `<table style="table-layout:fixed"><colgroup>${b.w.map(x=>`<col style="width:${(x/s*100).toFixed(1)}%">`).join("")}</colgroup>`+b.rows.map(r=>`<tr>${r.map(c=>`<td${c.cs>1?` colspan="${c.cs}"`:""}${c.rs>1?` rowspan="${c.rs}"`:""} style="${b.nb||c.nb?"border:0;":""}white-space:pre-wrap;${c.al=="l"?"text-align:left;":c.al=="j"?"text-align:justify;":c.al=="r"?"text-align:right;":""}${c.b?"font-weight:700;":""}${c.i?"font-style:italic;":""}${c.z?"font-size:"+c.z/2+"pt;":""}${c.sh?"background:#d9d9d9;":""}">${esc(c.x)}</td>`).join("")}</tr>`).join("")+`</table>`};
+const gridHtml=b=>{const s=b.w.reduce((a,x)=>a+x,0);return `<table style="table-layout:fixed"><colgroup>${b.w.map(x=>`<col style="width:${(x/s*100).toFixed(1)}%">`).join("")}</colgroup>`+b.rows.map(r=>`<tr>${r.map(c=>`<td${c.cs>1?` colspan="${c.cs}"`:""}${c.rs>1?` rowspan="${c.rs}"`:""} style="${b.nb||c.nb?"border:0;":""}white-space:pre-wrap;overflow-wrap:anywhere;${c.al=="l"?"text-align:left;":c.al=="j"?"text-align:justify;":c.al=="r"?"text-align:right;":""}${c.b?"font-weight:700;":""}${c.i?"font-style:italic;":""}${c.z?"font-size:"+c.z/2+"pt;":""}${c.sh?"background:#d9d9d9;":""}">${esc(c.x)}</td>`).join("")}</tr>`).join("")+`</table>`};
 // file names, same pattern for every letter: "<AR|S.I|C.R><number> dated <MMDDYY> <letter type>.docx"  e.g. AR32840 dated 092526 TRANSMITTAL VIA ONLINE.docx
 function refPre(t){t=String(t||"").trim();if(/CIS/i.test(t))return"CIS";if(/(^|[^A-Z])S\.?I([^A-Z]|$)/i.test(t))return"S.I";if(/(^|[^A-Z])C\.?R([^A-Z]|$)/i.test(t))return"C.R";if(/(^|[^A-Z])A\.?R([^A-Z]|$)/i.test(t))return"AR";return t.replace(/^reference\s+/i,"").replace(/\s*(number|no\.?)\s*$/i,"").replace(/[\\\/:*?"<>|]/g,"").trim()||"AR"}
 const d6=d=>{const[y,m,dd]=String(d||"").split("-");return y&&m&&dd?m+dd+String(y).slice(2):""};
@@ -1569,7 +1569,8 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.128",date:"2026-11-19",cur:1,groups:[{k:"Fixed",i:["Print PR only no longer shows an empty first page."]}]},
+ {v:"3.0.129",date:"2026-11-19",cur:1,groups:[{k:"Fixed",i:["Unused Premium table: total row edge to edge, Encumbrance wraps."]}]},
+ {v:"3.0.128",date:"2026-11-19",groups:[{k:"Fixed",i:["Print PR only no longer shows an empty first page."]}]},
  {v:"3.0.127",date:"2026-11-19",groups:[{k:"Fixed",i:["PR GP / NP table shows lines on the row labels."]}]},
  {v:"3.0.126",date:"2026-11-19",groups:[{k:"Fixed",i:["Unused Premium Refund checks the request form required fields."]}]},
  {v:"3.0.125",date:"2026-11-19",groups:[{k:"Fixed",i:["Unused Premium Refund: Download request form (.xlsx) shows."]}]},

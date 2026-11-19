@@ -4,13 +4,13 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.118
+**Current version:** v3.0.122
 
 ## Features
 
 - **Letter types by category:** Confirmation of Coverage (CL), I-CARD, Underpayment, Premium Refund, Deficiency, Request for FME, Payment for Underpayment (Approval), Late Remittance, Certificate of No Previous Coverage, Renewal Notice, Authority to Deduct (ATD), Transmittal, Cancellation, and Multiple Discrepancies (combined sections).
 - **Live letter preview** that paginates like the printed letter. The preview stays blank until a letter type is chosen.
-- **Downloads:** Word (`.docx`), Excel request form (`.xlsx`), and Print / PDF.
+- **Downloads:** Word (`.docx`), Excel request form (`.xlsx`), and Print / PDF, Print letter only, and Print PR only (the request for payment form).
 - **Save location:** Save as (ask each time, default), save to a chosen folder, or normal browser download. Folder and Save as work in Chrome and Edge on a computer.
 - **Drafts:** the last letter is restored automatically after a page refresh, and named drafts can be saved, duplicated and deleted.
 - **Cooperative directory:** remembers cooperatives, branches and managers and fills in name, position and address. A shared list is kept in a Google Sheet so every UA sees the same entries. Backup and import are available.
@@ -29,7 +29,7 @@ Developed by Daigo. © 2026 Daigo. All rights reserved.
 - Everything runs in the browser from one HTML file. No build step.
 - Shared data (UA list, directory, roster, activity log) is stored in a Google Sheet through a Google Apps Script web app (`directory-apps-script.gs`).
 - The Word and Excel libraries (`docx`, `exceljs`) load from cdn.jsdelivr.net, so an internet connection is needed to generate those files.
-- A content security policy limits the page to its own code, those two libraries and the Google Apps Script address.
+- A content security policy limits the page to its own code, those two libraries and the Google Apps Script address. Each library link carries an integrity hash, so a changed file will not run.
 - Drafts and settings are kept in the browser's local storage. The saved draft is cleared on log out.
 
 ## Use

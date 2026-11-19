@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.130
+**Current version:** v3.0.131
 
 ## Features
 
@@ -15,6 +15,7 @@ Developed by Daigo. © 2026 Daigo. All rights reserved.
 - **Drafts:** the last letter is restored automatically after a page refresh, and named drafts can be saved, duplicated and deleted.
 - **Cooperative directory:** remembers cooperatives, branches and managers and fills in name, position and address. A shared list is kept in a Google Sheet so every UA sees the same entries. Backup and import are available.
 - **Reference types:** A.R. No., S.I. No. and C.R. No. (reference and date shown in bold in the letter).
+- **Quick fill:** paste lines such as `Name:`, `Position:`, `Cooperative:`, `Address:` and `A.R. No.:` to fill the addressee and reference fields. It runs in the browser only, so nothing is sent anywhere.
 - **Version changes:** click the version number at the top of the page to see the short change log.
 
 ## Login and administration

@@ -617,7 +617,7 @@ function form0(){if(!S.pPlanM)S.p_plan=planCode(S.plan)||S.plan||S.p_plan;
  isND();
  const multi=S.type=="multi"||S.type=="rep";
  document.getElementById("f").innerHTML=`<h2>Letter type</h2><select id="ty">${S.pick?"":'<option value="" selected disabled>Choose letter type</option>'}${tyOpts(S.pick?S.type:"")}</select>
- <h2>Addressee</h2><label>Date<input type="date" data-k="date" value="${S.date}"></label>${I("to","Name (start with a title, e.g. MR. JUAN A. DELA CRUZ)")}${dirForm()}
+ <details class="dg" id="qf"><summary>Quick fill from pasted text</summary><textarea id="qfTx" rows="6" placeholder="Name: MR. JUAN A. DELA CRUZ&#10;Position: Manager&#10;Cooperative: ABC Multi-Purpose Cooperative&#10;Branch: Main&#10;Address: Street, Barangay, City&#10;A.R. No.: 12345&#10;A.R. Date: November 18, 2026" style="width:100%;box-sizing:border-box"></textarea><button type="button" id="qfGo" class="b">Fill the form</button><p id="qfOut" style="font-size:12px;margin:6px 0 0"></p></details><h2>Addressee</h2><label>Date<input type="date" data-k="date" value="${S.date}"></label>${I("to","Name (start with a title, e.g. MR. JUAN A. DELA CRUZ)")}${dirForm()}
  ${canInv()?`<h2>Opening message</h2><label>Letter starts with<select id="opn">${OP([["ar","Acknowledgement of receipt (A.R. / S.I. / C.R.)"],["inv","Report reference (1 CISP S.I. / A.R. / C.R.)"]],S.open||"ar")}</select></label>`:""}${useInv()?`<h2>Report reference</h2><div class="g2">${I("rpl","Report")}${I("rmo","Month covered")}</div><label>Reference type<select id="irt">${OP(["S.I. No.","A.R. No.","C.R. No."].map(o=>[o,o]),IRT())}</select></label><div class="g2">${I("inv","1 CISP "+IRT())}<label>Invoice date<input type="date" data-k="invDate" value="${S.invDate}"></label></div>`:""}${!useInv()||needRef()?`<h2>Reference</h2><label>Reference type<select id="rt">${OP(["A.R. No.","S.I. No.","C.R. No."].map(o=>[o,o]),S.rt)}</select></label><div class="g2">${I("ar",S.rt.replace(/ No\.?$/," Number"))}<label>Date<input type="date" data-k="arDate" value="${S.arDate}"></label></div>${planUsed()?`<label>Plan name<select id="pn">${OP([...PLANS,["","Other (type manually)"]],PLANS.some(p=>p[0]==S.plan)?S.plan:"")}</select></label>${I("plan","Plan name (edit or type)")}`:""}`:""}
  ${S.type=="den"||multi?I("reason","Reason for denial (default remark)"):""}
  ${S.type=="multi"?`<label>Introduction<textarea rows="3" data-k="intro">${esc(S.intro)}</textarea></label>`:""}
@@ -1569,7 +1569,8 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.130",date:"2026-11-19",cur:1,groups:[{k:"Added",i:["Login logo uses the welcome page animation."]}]},
+ {v:"3.0.131",date:"2026-11-20",cur:1,groups:[{k:"Added",i:["Time-based greetings; Quick fill from pasted text."]}]},
+ {v:"3.0.130",date:"2026-11-19",groups:[{k:"Added",i:["Login logo uses the welcome page animation."]}]},
  {v:"3.0.129",date:"2026-11-19",groups:[{k:"Fixed",i:["Unused Premium table: total row edge to edge, right-aligned, Encumbrance wraps."]}]},
  {v:"3.0.128",date:"2026-11-19",groups:[{k:"Fixed",i:["Print PR only no longer shows an empty first page."]}]},
  {v:"3.0.127",date:"2026-11-19",groups:[{k:"Fixed",i:["PR GP / NP table shows lines on the row labels."]}]},
@@ -1730,11 +1731,25 @@ const CHANGELOG=[
  const shell=[document.querySelector(".top"),document.querySelector(".app")];
  $("lgImg").src=document.querySelector(".top .lg").src;
  us.append(Object.assign(document.createElement("option"),{value:"",textContent:"Select your name"}),...UA.map(n=>Object.assign(document.createElement("option"),{value:n,textContent:n})));
- const first=n=>{const w=n.split(/\s+/)[0];return w.charAt(0)+w.slice(1).toLowerCase()};
+ const greetIn=()=>{const h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening"};
+const greetOut=()=>{const h=new Date().getHours();return h<12?"Have a great day":h<18?"Have a great afternoon":"Have a restful evening"};
+const QF=[["to",/^(name|addressee|attention|attn|to|manager|manager name)$/],["role",/^(position|designation|role|title)$/],["org",/^(cooperative|coop|co-op|organization|organisation|org)$/],["branch",/^branch$/],["addr",/^address$/],["sal",/^(salutation|greeting)$/],["arDate",/^(a\.?r\.?|s\.?i\.?|c\.?r\.?)\s*date$/],["ar",/^(a\.?r\.?|s\.?i\.?|c\.?r\.?)\s*(no\.?|number|#)?$/],["date",/^(letter date|date of letter|date)$/]];
+const qfIso=t=>{const d=new Date(t);if(isNaN(d))return"";return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function qfFill(txt){const got=[],LB={to:"Name",role:"Position",org:"Cooperative",branch:"Branch",addr:"Address",sal:"Salutation",ar:"Reference no.",arDate:"Reference date",date:"Letter date"};
+ txt.split(/\r?\n/).forEach(l=>{const m=l.match(/^\s*([^:=]{1,24}?)\s*[:=]\s*(.+?)\s*$/);if(!m)return;const lab=m[1].trim().toLowerCase(),v=m[2].trim();
+  const hit=QF.find(q=>q[1].test(lab));if(!hit)return;const k=hit[0];
+  if(k=="date"||k=="arDate"){const d=qfIso(v);if(!d)return;S[k]=d}
+  else if(k=="to")S.to=v.toUpperCase();
+  else{S[k]=v;if(k=="branch")S.hasBr=true;if(k=="ar"){const r=lab.match(/^(a|s|c)/);if(r)S.rt={a:"A.R. No.",s:"S.I. No.",c:"C.R. No."}[r[1]]}}
+  if(!got.includes(LB[k]))got.push(LB[k])});
+ const t=S.to.match(/^(MR|MS|MRS)\.?\s+(.+)$/i);if(t&&got.includes("Name")&&!got.includes("Salutation")){const sn=t[2].trim().split(/\s+/).pop();S.sal="Dear "+t[1][0].toUpperCase()+t[1].slice(1).toLowerCase()+". "+sn.charAt(0).toUpperCase()+sn.slice(1).toLowerCase()+":"}
+ return got}
+document.addEventListener("click",e=>{if(!e.target||e.target.id!="qfGo")return;const ta=document.getElementById("qfTx"),out=document.getElementById("qfOut");if(!ta||!out)return;const got=qfFill(ta.value);if(!got.length){out.textContent="Nothing recognized. Put each detail on its own line, like Name: MR. JUAN A. DELA CRUZ";return}form();render();const o2=document.getElementById("qfOut");if(o2)o2.textContent="Filled: "+got.join(", ")+". Please check each field."});
+const first=n=>{const w=n.split(/\s+/)[0];return w.charAt(0)+w.slice(1).toLowerCase()};
  function lock(){document.body.classList.add("lk");shell.forEach(e=>e&&(e.inert=true));ob.hidden=true;pb.hidden=true;pw.value="";er.textContent="";us.focus()}
  function unlock(){document.body.classList.remove("lk");shell.forEach(e=>e&&(e.inert=false));wn.textContent=first(AUTH.user);ob.title="Logged in as "+AUTH.user+" \u2013 click to log out";ob.hidden=false;pb.hidden=false}
  if(AUTH.user)unlock();else lock();
- function welcome(){const sp=$("spOv");$("spImg").src=$("lgImg").src;$("spHi").textContent="Welcome, "+first(AUTH.user);const rm=matchMedia("(prefers-reduced-motion:reduce)").matches;let done=false;const end=()=>{if(done)return;done=true;sp.classList.add("out");setTimeout(()=>sp.classList.remove("on","out"),rm?0:500)};sp.classList.remove("out");sp.classList.add("on");sp.onclick=null;sp.tabIndex=-1;try{document.activeElement.blur();sp.focus({preventScroll:true})}catch(x){}setTimeout(end,rm?1200:3300)}
+ function welcome(){const sp=$("spOv");$("spImg").src=$("lgImg").src;$("spHi").textContent=greetIn()+", "+first(AUTH.user);const rm=matchMedia("(prefers-reduced-motion:reduce)").matches;let done=false;const end=()=>{if(done)return;done=true;sp.classList.add("out");setTimeout(()=>sp.classList.remove("on","out"),rm?0:500)};sp.classList.remove("out");sp.classList.add("on");sp.onclick=null;sp.tabIndex=-1;try{document.activeElement.blur();sp.focus({preventScroll:true})}catch(x){}setTimeout(end,rm?1200:3300)}
  const pwRemote=async(action,o)=>{if(!DIR_API)return null;return uwnPost(Object.assign({action,key:DIR_KEY},o))};
  /* ===== v3.0.87: secure login (checked by the Google Sheet script) ===== */
  const proofOf=async(u,p)=>{if(!(window.crypto&&crypto.subtle))throw new Error("nocrypto");const en=new TextEncoder(),k=await crypto.subtle.importKey("raw",en.encode(String(p).normalize("NFKC")),"PBKDF2",false,["deriveBits"]),bits=await crypto.subtle.deriveBits({name:"PBKDF2",hash:"SHA-256",salt:en.encode("uwn2|"+u),iterations:600000},k,256);return Array.from(new Uint8Array(bits),x=>x.toString(16).padStart(2,"0")).join("")};
@@ -1926,7 +1941,7 @@ const CHANGELOG=[
   try{pwRemote("logout",{token:AUTH.tok})}catch(x){}clearTimeout(idleT);try{localStorage.removeItem(DK)}catch(x){}
   try{sessionStorage.removeItem(AUTH.key)}catch(x){}
   const by=$("byOv"),rm=matchMedia("(prefers-reduced-motion:reduce)").matches;
-  $("byImg").src=$("lgImg").src;$("byHi").textContent="Goodbye, "+first(AUTH.user);by.classList.add("on");
+  $("byImg").src=$("lgImg").src;$("byHi").textContent=greetOut()+", "+first(AUTH.user);by.classList.add("on");
   setTimeout(()=>location.reload(),rm?500:1900);
  });
 })();

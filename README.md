@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.117
+**Current version:** v3.0.118
 
 ## Features
 
@@ -20,7 +20,7 @@ Developed by Daigo. © 2026 Daigo. All rights reserved.
 ## Login and administration
 
 - UAs log in with their name and password. Passwords are stored as hashed values, not readable text.
-- Users can change their own password (minimum 8 characters). Repeated wrong tries lock a name for a short time.
+- Users can change their own password (minimum 12 characters). Repeated wrong tries lock a name for a short time.
 - Sessions end after 24 hours without activity.
 - An Administrator panel (button on the login screen) lets the admin reset or unlock UA passwords, force log out, add or remove UAs, manage marketing contacts, approvers and bank accounts, and view the activity log.
 

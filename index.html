@@ -527,7 +527,7 @@ function prHtml(m){
  <tr><td colspan="9" style="border:0;height:8px"></td></tr>${totRows(m).map(([l,v,x])=>`<tr><td class="nb" colspan="8" style="${x?"":"font-weight:400"}">${esc(l)}</td><td style="text-align:right">${x?"<b>"+money(v)+"</b>":money(v)}</td></tr>`).join("")}</table>
  <p style="font-weight:700;font-size:8pt;margin:6px 0 18px">${NOTE}</p>
  <table class="g"><tr><td>Requested by:</td><td>Approved by:</td></tr><tr><td style="padding-top:26px">${sImgF(m.sig[0])}____________________</td><td style="padding-top:26px">${sImgF(m.app[0])}_______________________</td></tr><tr><td class="v">${esc(m.sig[0])}</td><td class="v">${esc(m.app[0])}</td></tr><tr><td>${esc(m.sig[1]||"")}</td><td>${esc(m.app[1]||"")}</td></tr></table>
- <p style="font-size:8pt;margin:6px 0">1cispcdourd${m.date.replace(/\//g,"-")}</p><div style="border-top:1px dashed #000;margin:10px 0 14px"></div>`+(rc?`<table class="t" style="width:55%;margin:10px auto 6px"><tr><th></th><th>PER S.I</th><th>PER UA</th><th>DIFFERENCE</th></tr>${[["GP",rc.gs,rc.gu],["less: SF",rc.fS,rc.fU],["add: TAX",rc.tS,rc.tU],["NP",rc.nS,rc.nU]].map(([l,a,c])=>`<tr><td class="nb">${l}</td><td style="text-align:right">${fz(a)}</td><td style="text-align:right">${fz(c)}</td><td style="text-align:right"><b>${fz(r2(a-c))}</b></td></tr>`).join("")}</table>
+ <p style="font-size:8pt;margin:6px 0">1cispcdourd${m.date.replace(/\//g,"-")}</p><div style="border-top:1px dashed #000;margin:10px 0 14px"></div>`+(rc?`<table class="t" style="width:55%;margin:10px auto 6px"><tr><th></th><th>PER S.I</th><th>PER UA</th><th>DIFFERENCE</th></tr>${[["GP",rc.gs,rc.gu],["less: SF",rc.fS,rc.fU],["add: TAX",rc.tS,rc.tU],["NP",rc.nS,rc.nU]].map(([l,a,c])=>`<tr><td style="text-align:right;font-weight:700">${l}</td><td style="text-align:right">${fz(a)}</td><td style="text-align:right">${fz(c)}</td><td style="text-align:right"><b>${fz(r2(a-c))}</b></td></tr>`).join("")}</table>
  <table class="t" style="width:55%;margin:6px auto"><tr><th>DEPOSITED/PAID</th><th>Less: PER S.I (NET)</th><th>ADJUSTMENTS (NET)</th></tr><tr><td style="text-align:right"><b>${fz(rc.dep)}</b></td><td style="text-align:right"><b>${fz(rc.nS)}</b></td><td style="text-align:right"><b>${fz(rc.adj)}</b></td></tr></table>
  <table class="t" style="width:55%;margin:6px auto"><tr><th>NET REFUND</th><th>NET OVER(UNDER)</th></tr><tr><td style="text-align:right"><b>${money(m.payable)}</b></td><td style="text-align:right">${rc.nov?fn(rc.nov):"-"}</td>${rc.nov<0?'<td style="border:0;text-align:left">*individual underpayment to collect</td>':""}</tr></table>`:"");
 }
@@ -727,8 +727,8 @@ async function dx(){
  put("B"+r,"____________________");put("I"+r,"_______________________");r++;put("B"+r,m.sig[0],{b:1});put("I"+r,m.app[0],{b:1});r++;put("B"+r,m.sig[1]||"");put("I"+r,m.app[1]||"");r++;
  put("C"+r,"1cispcdourd"+m.date.replace(/\//g,"-"),{z:8});r++;"BCDEFGHIJ".split("").forEach(c=>ws.getCell(c+r).border={top:{style:"dashed"}});r++;
  if(m.rc){const c=m.rc,H=(a,t)=>put(a,t,{b:1,h:"center",bd:1,f:1});
-  H("E"+r,"PER S.I");H("F"+r,"PER UA");H("G"+r,"DIFFERENCE");r++;
-  [["GP",c.gs,c.gu],["less: SF",c.fS,c.fU],["add: TAX",c.tS,c.tU],["NP",c.nS,c.nU]].forEach(([l,a,b])=>{put("C"+r,l,{b:1,h:"right"});put("E"+r,a,{n:1,bd:1,h:"right"});put("F"+r,b,{n:1,bd:1,h:"right"});put("G"+r,r2(a-b),{n:1,bd:1,b:1,h:"right"});r++});r++;
+  H("C"+r,"");mg(`C${r}:D${r}`);H("E"+r,"PER S.I");H("F"+r,"PER UA");H("G"+r,"DIFFERENCE");r++;
+  [["GP",c.gs,c.gu],["less: SF",c.fS,c.fU],["add: TAX",c.tS,c.tU],["NP",c.nS,c.nU]].forEach(([l,a,b])=>{put("C"+r,l,{b:1,h:"right",bd:1});mg(`C${r}:D${r}`);put("E"+r,a,{n:1,bd:1,h:"right"});put("F"+r,b,{n:1,bd:1,h:"right"});put("G"+r,r2(a-b),{n:1,bd:1,b:1,h:"right"});r++});r++;
   H("E"+r,"DEPOSITED/PAID");H("F"+r,"Less: PER S.I (NET)");H("G"+r,"ADJUSTMENTS (NET)");r++;put("E"+r,c.dep,{n:1,bd:1,b:1,h:"right"});put("F"+r,c.nS,{n:1,bd:1,b:1,h:"right"});put("G"+r,c.adj,{n:1,bd:1,b:1,h:"right"});r+=2;
   H("E"+r,"NET REFUND");H("F"+r,"NET OVER(UNDER)");r++;put("E"+r,m.payable,{n:1,bd:1,b:1,h:"right"});put("F"+r,c.nov,{n:1,bd:1,h:"right"});put("G"+r,c.nov<0?"*individual underpayment to collect":"");}
  ws.pageSetup.printArea="B6:J"+r;
@@ -1569,7 +1569,8 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.126",date:"2026-11-19",cur:1,groups:[{k:"Fixed",i:["Unused Premium Refund checks the request form required fields."]}]},
+ {v:"3.0.127",date:"2026-11-19",cur:1,groups:[{k:"Fixed",i:["PR GP / NP table shows lines on the row labels."]}]},
+ {v:"3.0.126",date:"2026-11-19",groups:[{k:"Fixed",i:["Unused Premium Refund checks the request form required fields."]}]},
  {v:"3.0.125",date:"2026-11-19",groups:[{k:"Fixed",i:["Unused Premium Refund: Download request form (.xlsx) shows."]}]},
  {v:"3.0.124",date:"2026-11-19",groups:[{k:"Changed",i:["Colors and icons on the other buttons."]}]},
  {v:"3.0.123",date:"2026-11-19",groups:[{k:"Changed",i:["Print buttons evenly aligned."]}]},

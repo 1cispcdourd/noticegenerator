@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.123
+**Current version:** v3.0.125
 
 ## Features
 
@@ -12,7 +12,7 @@ Developed by Daigo. © 2026 Daigo. All rights reserved.
 - **Live letter preview** that paginates like the printed letter. The preview stays blank until a letter type is chosen.
 - **Downloads:** Word (`.docx`), Excel request form (`.xlsx`), and Print / PDF, Print letter only, and Print PR only (the request for payment form).
 - **Save location:** Save as (ask each time, default), save to a chosen folder, or normal browser download. Folder and Save as work in Chrome and Edge on a computer.
-- **Drafts:** the last letter is restored automatically after a page refresh, and named drafts can be saved, duplicated and deleted. Drafts can also be saved to your own folder in the shared Google Drive folder (one folder per UA; the script keeps each UA out of the others' folders).
+- **Drafts:** the last letter is restored automatically after a page refresh, and named drafts can be saved, duplicated and deleted. When logged in, drafts are saved to your own folder in the shared Google Drive folder (one folder per UA; the script keeps each UA out of the others' folders).
 - **Cooperative directory:** remembers cooperatives, branches and managers and fills in name, position and address. A shared list is kept in a Google Sheet so every UA sees the same entries. Backup and import are available.
 - **Reference types:** A.R. No., S.I. No. and C.R. No. (reference and date shown in bold in the letter).
 - **Version changes:** click the version number at the top of the page to see the short change log.

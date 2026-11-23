@@ -80,7 +80,7 @@ details summary{color:var(--ac);font-weight:600}
 #jump.nk{color:var(--rd);background:color-mix(in srgb,var(--rd) 9%,transparent);border-color:color-mix(in srgb,var(--rd) 40%,transparent)}
 #dl{grid-column:1/-1;padding:11px 14px;font-size:14px;letter-spacing:.01em;background:linear-gradient(90deg,#163f86,var(--ac));box-shadow:0 3px 10px color-mix(in srgb,var(--ac) 35%,transparent)}
 #dl:hover{filter:brightness(1.08)}#dl::before{content:"\2B07\FE0F  "}#pr::before{content:"\1F5A8\FE0F  "}#pl::before{content:"\1F4C4  "}
-#pr,#pl{order:1}#vw,#dx{order:2;grid-column:1/-1}
+#pl{order:1}#pr{order:2;grid-column:1/-1}.bar:not(:has(#pp)) #pl{grid-column:1/-1}#vw,#dx{order:2;grid-column:1/-1}
 #dx{border:1.5px solid var(--ye);background:color-mix(in srgb,var(--ye) 18%,transparent);color:var(--tx)}#dx::before{content:"\1F4CA  "}
 .dg{order:9;grid-column:1/-1;margin:0;border:1px solid var(--bd);border-radius:10px;padding:7px 11px;background:var(--card)}
 .dg summary{font-size:12px;font-weight:700;letter-spacing:.07em;color:var(--ac)}
@@ -1574,7 +1574,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.126",date:"2026-11-23",cur:1,groups:[{k:"Fixed",i:["Removed the empty boxed cell above the GP / SF / TAX / NP labels in the PR form."]}]},
+ {v:"3.0.126",date:"2026-11-23",cur:1,groups:[{k:"Fixed",i:["Removed the empty boxed cell above the GP / SF / TAX / NP labels in the PR form."]},{k:"Changed",i:["Print letter only and Print / PDF swapped; Print / PDF is full width."]}]},
  {v:"3.0.125",date:"2026-11-23",groups:[{k:"Fixed",i:["Print PR only has no blank first page. PR preview and print have page margins."]}]},
  {v:"3.0.124",date:"2026-11-23",groups:[{k:"Changed",i:["Drafts show only the Google Drive controls when logged in."]}]},
  {v:"3.0.123",date:"2026-11-23",groups:[{k:"Added",i:["Save drafts to your own Google Drive folder."]}]},

@@ -1,13 +1,17 @@
-# Underwriting Notice Generator
+# Underwriting Processing Tool
 
 A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to prepare underwriting letters, preview them as a formal letter, and download them as Word files.
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.127
+**Current version:** v3.0.135
 
 ## Features
 
+- **Tool bar:** buttons at the top switch between tools. Current tools: **Letter generator**, **Name splitter**, **Premium calculator** and **Underwriting FAQ**.
+- **Name splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
+- **Premium calculator:** the CIS computation workbook (COMPUTATION - CIS V4.1) as a tool. Type or paste members (branch, name, birthdate, sum insured, effective and expiry dates, premium paid) and it works out age, term, rate, premium due and over / (under) payment, with the summary, service fees, net premium and approver. Separate tabs list the **Underpayment**, **Overpayment** and **Substandard rating** tables (with a rate multiplier per member) and a **Pro-rated** calculator. A cooperative rating list fills the rate and service fee. The Underpayment tab can send its rows into an underpayment letter, and the Overpayment tab into the Premium Refund – Overpayment letter. Results download as an Excel file (values only). Member details are not saved anywhere and are cleared on refresh.
+- **Underwriting FAQ:** a searchable list of the questions and answers in the Underwriting Department FAQ deck (LPPI plan). Type words to filter (every word must match, matches are highlighted), pick a section, and expand or collapse the answers. Tables from the deck (misstatement of age, premium rating without an application form, discrepancies, underpayment to collect or forego, incontestability examples) are shown as tables. The grey slide number points back to the deck. The text is built into `index.html`; to change an answer, edit the `FAQ` data in the Underwriting FAQ script.
 - **Letter types by category:** Confirmation of Coverage (CL), I-CARD, Underpayment, Premium Refund, Deficiency, Request for FME, Payment for Underpayment (Approval), Late Remittance, Certificate of No Previous Coverage, Renewal Notice, Authority to Deduct (ATD), Transmittal, Cancellation, Multiple Discrepancies (combined sections), and Customized Letter (a blank letter with your own title, text, optional reference and tables with any number of rows and columns).
 - **Live letter preview** that paginates like the printed letter. The preview stays blank until a letter type is chosen.
 - **Downloads:** Word (`.docx`), Excel request form (`.xlsx`), and Print / PDF, Print letter only, and Print PR only (the request for payment form). In the request for payment form, the Reason and Particulars of each member can be typed freely.
@@ -52,6 +56,13 @@ To change the shared data connection, set up the Google Sheet and Apps Script fr
 | `index.html` | The whole tool |
 | `directory-apps-script.gs` | Google Apps Script for the shared Google Sheet |
 | `directory.json` | Optional directory backup |
+
+## Adding a new tool
+
+1. Add a section to `index.html` next to `<div id="nsApp" class="tool-off">`, with its own id and the class `tool-off` (hidden until chosen).
+2. Add one line to the `TOOLS` list in the tool bar script (`{id, label, el}`). The button appears by itself.
+3. Add the new section's id to the `shell` list in the login script so it is locked before login, and hide it in print if needed.
+4. Use only the libraries already loaded (`docx`, `exceljs`), or add a new library link with an integrity hash and allow its host in the content security policy.
 
 ## Changing the tool
 

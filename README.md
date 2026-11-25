@@ -1,14 +1,14 @@
 # Underwriting Processing Tool
 
-A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to prepare underwriting letters, preview them as a formal letter, and download them as Word files. It also holds a premium calculator, a masterlist generator, a name splitter and an underwriting FAQ.
+A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to prepare underwriting letters, preview them as a formal letter, and download them as Word files. It also holds a premium calculator, a masterlist generator, a name splitter, an underwriting FAQ and an age calculator.
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.143
+**Current version:** v3.0.145
 
 ## Tools
 
-Buttons in the tool bar at the top switch between tools, in this order:
+The **Underwriting Tools** button at the top opens a list of tool buttons. Pick one to switch tools (the current tool is highlighted, and the list closes after you pick). Tools, in this order:
 
 1. **Letter Generator:** prepares underwriting letters (see below).
 2. **Masterlist Generator:** builds the list of insured members as an Excel file with the 1CISP letterhead, for SIP, SGYRT, GYRT, GBLISS, YES and Special GYRT (residency 0-119 and 120 and above).
@@ -18,6 +18,11 @@ Buttons in the tool bar at the top switch between tools, in this order:
    - **Send to letter generator** on the Underpayment tab fills the Underpayment letter table. On the Overpayment tab it fills the Premium Refund – Overpayment letter table.
 4. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
 5. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
+6. **Age Calculator:** results appear as soon as the dates are picked, and each result has a Copy button. Dates are counted as whole days, like in Excel.
+   - **Age:** `ROUND((Effectivity date - Birth date) / 365, 0)`
+   - **Number of days:** `Date to - Date from`
+   - **Number of months:** `ROUND((Date to - Date from) / (365 / 12), 0)`
+   - A warning shows when the birth date is later than the effectivity date, or Date to is earlier than Date from.
 
 ## Letter Generator
 
@@ -34,7 +39,7 @@ Buttons in the tool bar at the top switch between tools, in this order:
 
 - **Version changes:** click the version number at the top of the page to see the short change log.
 - **Account menu:** after login, a "Welcome! (your name)" pill appears at the top right. Click it to open **Change password** or **Log out**.
-- On small screens the tool buttons wrap onto their own row and the header stops sticking, so the letter has more room.
+- On small screens the subtitle is hidden, the header items wrap, and on phones and short screens the header stops sticking, so the letter has more room.
 
 ## Login and administration
 
@@ -76,7 +81,7 @@ To change the shared data connection, set up the Google Sheet and Apps Script fr
 ## Adding a new tool
 
 1. Add a section to `index.html` next to `<div id="nsApp" class="tool-off">`, with its own id and the class `tool-off` (hidden until chosen).
-2. Add one line to the `TOOLS` list in the tool bar script (`{id, label, el}`). The button appears by itself. Keep the label in title case (for example, Letter Generator) to match the other tools.
+2. Add one line to the `TOOLS` list in the tool bar script (`{id, label, el}`). It appears in the Underwriting Tools list by itself. Keep the label in title case (for example, Letter Generator) to match the other tools.
 3. Add the new section's id to the `shell` list in the login script so it is locked before login, and hide it in print if needed.
 4. Use only the libraries already loaded (`docx`, `exceljs`), or add a new library link with an integrity hash and allow its host in the content security policy.
 

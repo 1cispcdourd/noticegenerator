@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.150
+**Current version:** v3.0.151
 
 ## Tools
 
@@ -15,6 +15,7 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
 3. **Premium Calculator:** based on the CIS computation workbook. Calculators for premium due, underpayment, overpayment, substandard rating and pro-rated premium, with an Excel download.
    - Premium due can be typed in to replace the computed amount (shown highlighted); it feeds the over / (under) payment, tables and letters.
    - Members with a sub-standard multiplier are compared against the multiplied premium. The total rate (rate x sub-standard rate) is rounded to 2 decimals.
+   - **Late remittance** tab: lists the members whose effectivity date is more than 60 days (61 or more) before the A.R. date, which is the **To date** in Rates and settings. The Summary status then reads Late remittance. **Send to letter generator** fills the Late Remittance – Other Plans letter table (name, A.R. no. and date, effectivity date, number of days). The optional A.R. no. box in Rates and settings goes into the letter. The Excel download gets a Late remittance sheet when there are late members.
    - **Amounts** (sum insured, premium paid, premium due, invoice and unused premium) are shown with 2 decimals, including when uploaded or pasted.
    - **Upload CSV / Excel** fills the member rows from a `.csv`, `.xlsx` or `.xlsm` file (for example the LPPI summary). Columns are matched by their header names (Last Name, First Name, MI, Suffix, Birthdate, Loan Amount or Sum Insured, Effectivity, Expiry, Gross Prem or Premium Paid). Lines without a name, such as the TOTAL line, are skipped. A file without a header row is read in the table's column order. If the table already has members, you are asked before they are replaced. Old `.xls` files must be saved as `.xlsx` or `.csv` first. The file is read in the browser and never leaves the computer.
    - **Gender:** the Members table has an optional Gender column. Only M, F, Male and Female are accepted; any other entry is cleared and the tool guesses from the first name instead (shown in grey in the cell). The upload fills it from a Gender or Sex column. The guess uses a list of common Filipino and English first names plus name endings, so it is not always right; type M or F to correct it. The Summary shows Male, Female and Others counts (Others means the name could not be identified), and the Excel download has the same counts and a Gender column.

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.158
+**Current version:** v3.0.159
 
 ## Tools
 
@@ -38,7 +38,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 - **Comparison:** month by month with the change from the previous month, and year to year against another saved sheet, for net premium, members, female, male or adjustments.
 - **Refresh** reads the sheet again; auto-refresh runs every 5 minutes while the page is open.
 - **Other Coops** (second item in the Summary Report list): production of the other coops, combined from the saved Google Sheet files. Every sheet tab (visible or hidden) that has the production columns is added together, found by its header names. Region 13 (under marketing Rosalina D. Martinez and Erwin M. Martinez) comes first; add Region 10, Region 9, BARMM and others by typing a name and region and pasting their Google Sheet link, then Save sheet.
-  - Shows gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing or per region**, with region, marketing, plan, year and month filters.
+  - Shows gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing, per region or per UA**, with region, UA, marketing, plan, year and month filters. The UA is read from the sheet's UA column (initials or name): JLJS, JCTA, KRMO (or KRO), HCOO (or HCO); blanks and anything else count as Others. Sheets made of several tabs are combined; tabs without the coop / gross premium headers are listed under the table.
   - The month is the A.R. date. Members come from the Male count and Female count columns, so rows not yet processed by Underwriting show 0.
   - Comparison: month by month and year against year, for net premium, gross premium, service fee, members, female or male.
 - The Google Apps Script reads the sheet, so the sheet needs no public sharing. Share it with the Google account that owns the script, paste the new `directory-apps-script.gs`, run **authorizeSheets** once, then deploy a new version.

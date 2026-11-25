@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.145
+**Current version:** v3.0.146
 
 ## Tools
 
@@ -15,6 +15,7 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
 3. **Premium Calculator:** based on the CIS computation workbook. Calculators for premium due, underpayment, overpayment, substandard rating and pro-rated premium, with an Excel download.
    - Premium due can be typed in to replace the computed amount (shown highlighted); it feeds the over / (under) payment, tables and letters.
    - Members with a sub-standard multiplier are compared against the multiplied premium. The total rate (rate x sub-standard rate) is rounded to 2 decimals.
+   - **Upload CSV / Excel** fills the member rows from a `.csv`, `.xlsx` or `.xlsm` file (for example the LPPI summary). Columns are matched by their header names (Last Name, First Name, MI, Suffix, Birthdate, Loan Amount or Sum Insured, Effectivity, Expiry, Gross Prem or Premium Paid). Lines without a name, such as the TOTAL line, are skipped. A file without a header row is read in the table's column order. If the table already has members, you are asked before they are replaced. Old `.xls` files must be saved as `.xlsx` or `.csv` first. The file is read in the browser and never leaves the computer.
    - **Send to letter generator** on the Underpayment tab fills the Underpayment letter table. On the Overpayment tab it fills the Premium Refund – Overpayment letter table.
 4. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
 5. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.148
+**Current version:** v3.0.149
 
 ## Tools
 
@@ -19,13 +19,13 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
    - **Upload CSV / Excel** fills the member rows from a `.csv`, `.xlsx` or `.xlsm` file (for example the LPPI summary). Columns are matched by their header names (Last Name, First Name, MI, Suffix, Birthdate, Loan Amount or Sum Insured, Effectivity, Expiry, Gross Prem or Premium Paid). Lines without a name, such as the TOTAL line, are skipped. A file without a header row is read in the table's column order. If the table already has members, you are asked before they are replaced. Old `.xls` files must be saved as `.xlsx` or `.csv` first. The file is read in the browser and never leaves the computer.
    - **Gender:** the Members table has an optional Gender column. Only M, F, Male and Female are accepted; any other entry is cleared and the tool guesses from the first name instead (shown in grey in the cell). The upload fills it from a Gender or Sex column. The guess uses a list of common Filipino and English first names plus name endings, so it is not always right; type M or F to correct it. The Summary shows Male, Female and Others counts (Others means the name could not be identified), and the Excel download has the same counts and a Gender column.
    - **Send to letter generator** on the Underpayment tab fills the Underpayment letter table. On the Overpayment tab it fills the Premium Refund – Overpayment letter table.
-4. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
-5. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
-6. **Age Calculator:** results appear as soon as the dates are picked, and each result has a Copy button. Dates are counted as whole days, like in Excel.
+4. **Age Calculator:** results appear as soon as the dates are picked, and each result has a Copy button. Dates are counted as whole days, like in Excel.
    - **Age:** `ROUND((Effectivity date - Birth date) / 365, 0)`
    - **Number of days:** `Date to - Date from`
    - **Number of months:** `ROUND((Date to - Date from) / (365 / 12), 0)`
    - A warning shows when the birth date is later than the effectivity date, or Date to is earlier than Date from.
+5. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
+6. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
 
 ## Letter Generator
 

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.152
+**Current version:** v3.0.156
 
 ## Tools
 
@@ -27,6 +27,21 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
    - A warning shows when the birth date is later than the effectivity date, or Date to is earlier than Date from.
 5. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
 6. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
+
+## Summary Report
+
+The **Summary Report** button at the top (next to Underwriting Tools) opens a list of reports, like the Underwriting Tools list. Pick one to open it. The first report is **FICCO**, read from the FICCO monitoring Google Sheet (one tab per UA, named by initials such as JCTA).
+
+- Shows total net premium, total female, total male, total members and total premium adjustments, **per plan name** or **overall (by UA)**, with UA, plan and month filters.
+- Net premium is the PREMIUM total column of each month; adjustments are the ADJUSTMENTS column. Totals are added up from the branch and plan rows, not from the sheet's own total row.
+- **Saved sheets:** type a name (for example FICCO 2027) and paste the Google Sheet link, then Save sheet. All UAs see the same saved list. Next year, save the new link and compare.
+- **Comparison:** month by month with the change from the previous month, and year to year against another saved sheet, for net premium, members, female, male or adjustments.
+- **Refresh** reads the sheet again; auto-refresh runs every 5 minutes while the page is open.
+- **Other Coops Report** (second item in the Summary Report list): production of the other coops, combined from the saved Google Sheet files. Every sheet tab (visible or hidden) that has the production columns is added together, found by its header names. Region 13 (under marketing Rosalina D. Martinez and Erwin M. Martinez) comes first; add Region 10, Region 9, BARMM and others by typing a name and region and pasting their Google Sheet link, then Save sheet.
+  - Shows gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing or per region**, with region, marketing, plan, year and month filters.
+  - The month is the A.R. date. Members come from the Male count and Female count columns, so rows not yet processed by Underwriting show 0.
+  - Comparison: month by month and year against year, for net premium, gross premium, service fee, members, female or male.
+- The Google Apps Script reads the sheet, so the sheet needs no public sharing. Share it with the Google account that owns the script, paste the new `directory-apps-script.gs`, run **authorizeSheets** once, then deploy a new version.
 
 ## Letter Generator
 

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.156
+**Current version:** v3.0.157
 
 ## Tools
 
@@ -37,7 +37,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 - **Saved sheets:** type a name (for example FICCO 2027) and paste the Google Sheet link, then Save sheet. All UAs see the same saved list. Next year, save the new link and compare.
 - **Comparison:** month by month with the change from the previous month, and year to year against another saved sheet, for net premium, members, female, male or adjustments.
 - **Refresh** reads the sheet again; auto-refresh runs every 5 minutes while the page is open.
-- **Other Coops Report** (second item in the Summary Report list): production of the other coops, combined from the saved Google Sheet files. Every sheet tab (visible or hidden) that has the production columns is added together, found by its header names. Region 13 (under marketing Rosalina D. Martinez and Erwin M. Martinez) comes first; add Region 10, Region 9, BARMM and others by typing a name and region and pasting their Google Sheet link, then Save sheet.
+- **Other Coops** (second item in the Summary Report list): production of the other coops, combined from the saved Google Sheet files. Every sheet tab (visible or hidden) that has the production columns is added together, found by its header names. Region 13 (under marketing Rosalina D. Martinez and Erwin M. Martinez) comes first; add Region 10, Region 9, BARMM and others by typing a name and region and pasting their Google Sheet link, then Save sheet.
   - Shows gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing or per region**, with region, marketing, plan, year and month filters.
   - The month is the A.R. date. Members come from the Male count and Female count columns, so rows not yet processed by Underwriting show 0.
   - Comparison: month by month and year against year, for net premium, gross premium, service fee, members, female or male.

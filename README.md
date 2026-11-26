@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.173
+**Current version:** v3.0.174
 
 ## Tools
 
@@ -68,6 +68,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 - **Live letter preview** that paginates like the printed letter. The preview stays blank until a letter type is chosen. Names of insured in the letter tables are shown in proper case.
 - **Downloads:** Word (`.docx`), Excel request form (`.xlsx`), and Print / PDF, Print letter only, and Print PR only (the request for payment form). In the request for payment form, the Reason and Particulars of each member can be typed freely. Its reference line shows the letter's A.R. / S.I. / C.R. number and date; if the letter was filled in with the 1CISP invoice number and date instead, those are shown. Its reference line shows the letter's A.R. / S.I. / C.R. number and date; if the letter was filled in with the 1CISP invoice number and date instead, those are shown.
 - **Underpayment amounts** are rounded to 2 decimals per member, so the total, service fee and net add up.
+- **Refund ending sentence:** with *Returned to your office (15 days)* selected, a net refund of ₱1,000 or less says *Please deduct ... refund on your next remittance* instead; the grey text in the manual box shows the wording the letter really uses. Choose *Always returned to your office (15 days)* to keep the 15-day wording for any amount, or type your own sentence in the box.
 - **Save location:** Save as (ask each time, default), save to a chosen folder, or normal browser download. Folder and Save as work in Chrome and Edge on a computer.
 - **Drafts:** the last letter is restored automatically after a page refresh, and named drafts can be saved, duplicated and deleted. When logged in, drafts are saved to your own folder in the shared Google Drive folder (one folder per UA; the script keeps each UA out of the others' folders).
 - **Cooperative directory:** remembers cooperatives, branches and managers and fills in name, position and address. A shared list is kept in a Google Sheet so every UA sees the same entries. Backup and import are available.

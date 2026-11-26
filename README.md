@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.159
+**Current version:** v3.0.160
 
 ## Tools
 
@@ -36,6 +36,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 - Net premium is the PREMIUM total column of each month; adjustments are the ADJUSTMENTS column. Totals are added up from the branch and plan rows, not from the sheet's own total row.
 - **Saved sheets:** type a name (for example FICCO 2027) and paste the Google Sheet link, then Save sheet. All UAs see the same saved list. Next year, save the new link and compare.
 - **Comparison:** month by month with the change from the previous month, and year to year against another saved sheet, for net premium, members, female, male or adjustments.
+- **Page refresh:** the last loaded data, the open report and the filters are kept for the browser tab (session storage) and shown at once after a refresh while the numbers update in the background. They are cleared on log out or when the session ends.
 - **Refresh** reads the sheet again; auto-refresh runs every 5 minutes while the page is open.
 - **Other Coops** (second item in the Summary Report list): production of the other coops, combined from the saved Google Sheet files. Every sheet tab (visible or hidden) that has the production columns is added together, found by its header names. Region 13 (under marketing Rosalina D. Martinez and Erwin M. Martinez) comes first; add Region 10, Region 9, BARMM and others by typing a name and region and pasting their Google Sheet link, then Save sheet.
   - Shows gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing, per region or per UA**, with region, UA, marketing, plan, year and month filters. The UA is read from the sheet's UA column (initials or name): JLJS, JCTA, KRMO (or KRO), HCOO (or HCO); blanks and anything else count as Others. Sheets made of several tabs are combined; tabs without the coop / gross premium headers are listed under the table.

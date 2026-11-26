@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.179
+**Current version:** v3.0.181
 
 ## Tools
 
@@ -166,3 +166,5 @@ This is an internal tool. Keep the repository private, because the page contains
 
 Layout (v3.0.178): every tool page uses the full page width. Matrix of Commission and Underwriting FAQ show two columns on wide screens and one on narrow screens.
 Letter Generator (v3.0.179): on screens wider than 1280 px the form takes half the page and the preview the other half.
+Premium calculator and Masterlist Generator (v3.0.180): on screens wider than 1100 px the boxes sit side by side (Rates and settings next to Summary; masterlist details next to the paste box).
+Letter form (v3.0.181): on screens wider than 1280 px the single-field boxes sit in two columns; checkboxes, text areas and sections stay full width, and an odd field out takes the full row.

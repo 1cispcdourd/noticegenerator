@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.178
+**Current version:** v3.0.179
 
 ## Tools
 
@@ -165,3 +165,4 @@ Each change bumps the version number (the version button and the page title foll
 This is an internal tool. Keep the repository private, because the page contains the Apps Script web app address and staff contact details.
 
 Layout (v3.0.178): every tool page uses the full page width. Matrix of Commission and Underwriting FAQ show two columns on wide screens and one on narrow screens.
+Letter Generator (v3.0.179): on screens wider than 1280 px the form takes half the page and the preview the other half.

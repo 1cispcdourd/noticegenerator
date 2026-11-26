@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.170
+**Current version:** v3.0.169
 
 ## Tools
 
@@ -27,10 +27,6 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
    - A warning shows when the birth date is later than the effectivity date, or Date to is earlier than Date from.
 5. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
 6. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
-
-## Small screens
-
-The page is built to work on a phone. On screens up to 700 px wide, buttons wrap their text and stay inside the screen, rows of buttons wrap onto a new line, and tables in the Administrator panel become cards. Do not name any element (id or class) starting with `ad`, `ads` or `banner`: some phone browsers with a built-in ad blocker hide such elements, which once hid a button. The Administrator panel uses the prefix `mg` instead.
 
 ## Page refresh
 
@@ -66,7 +62,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 
 - **Letter types by category:** Confirmation of Coverage (CL), I-CARD, Underpayment, Premium Refund, Deficiency, Request for FME, Payment for Underpayment (Approval), Late Remittance, Certificate of No Previous Coverage, Renewal Notice, Authority to Deduct (ATD), Transmittal, Cancellation, Multiple Discrepancies (combined sections), and Customized Letter (a blank letter with your own title, text, optional reference and tables with any number of rows and columns).
 - **Live letter preview** that paginates like the printed letter. The preview stays blank until a letter type is chosen. Names of insured in the letter tables are shown in proper case.
-- **Downloads:** Word (`.docx`), Excel request form (`.xlsx`), and Print / PDF, Print letter only, and Print PR only (the request for payment form). In the request for payment form, the Reason and Particulars of each member can be typed freely.
+- **Downloads:** Word (`.docx`), Excel request form (`.xlsx`), and Print / PDF, Print letter only, and Print PR only (the request for payment form). In the request for payment form, the Reason and Particulars of each member can be typed freely. Its reference line shows the letter's A.R. / S.I. / C.R. number and date; if the letter was filled in with the 1CISP invoice number and date instead, those are shown.
 - **Underpayment amounts** are rounded to 2 decimals per member, so the total, service fee and net add up.
 - **Save location:** Save as (ask each time, default), save to a chosen folder, or normal browser download. Folder and Save as work in Chrome and Edge on a computer.
 - **Drafts:** the last letter is restored automatically after a page refresh, and named drafts can be saved, duplicated and deleted. When logged in, drafts are saved to your own folder in the shared Google Drive folder (one folder per UA; the script keeps each UA out of the others' folders).

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.175
+**Current version:** v3.0.176
 
 ## Tools
 
@@ -25,17 +25,32 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
      - A rate in the matrix that is not a plain number (for example `old - 7.80 / new - 12.00`) is not filled; type the rate yourself.
      - 42 built-in cooperatives from the earlier list (not in the Mindanao matrix) stay in the list; a name found in the matrix uses the matrix.
      - **Commission matrix (Google Sheet)** box (under Overage settings): type a name and paste the Google Sheet link of the new matrix (open the LPPI tab first so the link carries its tab), then **Save matrix link**. All UAs use the saved link, like the Summary Report sheets. **Refresh matrix** reads it again. The script finds the tab and columns by their header names (NAME OF COOPERATIVE, COOP SERVICE FEE, GROSS ANNUAL RATE / THOUSAND, NEL, SPECIAL RATE FOR OVERAGE in rows 1 to 10), so new rows and moved columns are picked up. The page also carries a copy of the matrix (2026-11-26) so the list works before the Google Sheet is read or when it cannot be read. The Google Sheet must be shared with the Google account that runs the Apps Script; run `authorizeSheets` once.
-4. **Age Calculator:** results appear as soon as the dates are picked, and each result has a Copy button. Dates are counted as whole days, like in Excel.
+4. **Matrix of Commission:** pick a cooperative and read everything written for it in the commission matrix (taken from its Memorandum of Agreement), plan by plan. It reads **every visible plan tab** of the saved Google Sheet (LPPI, GYRT, GBLISS, SIP, SII, GPAI or ICARD, KOOPAMILYA, YES) and **every filled column**, using the same saved link as the Premium calculator (Commission matrix box). Nothing is written to the sheet.
+   - Search: type the start of any word in the name; the list also shows which plan tabs the cooperative is in. A cooperative in several plans gets one button per plan tab; a cooperative with more than one row in a tab gets a Row button for each.
+   - The answer is set out as questions: commission and service fee, rates, premium and coverage, age limits and overage, underwriting requirements (NEL / NML, contestability), claims, special arrangements and remarks, transferred business, MOA / proposal / master policy, and the officers and marketing agent. The Ask buttons show one question only; the search box inside the cooperative finds a word in any field (for example NEL or waived); each question has a Copy button.
+   - Values are shown exactly as the Google Sheet displays them (percent signs, dates). Empty cells are left out. Header labels come from the sheet, so new columns appear without changing the page. Columns are matched by the header row (NAME OF COOPERATIVE) of each tab, so a new plan tab is picked up too; hidden tabs are ignored.
+   - Needs Google Apps Script **v3.0.176** (paste, then deploy a new version). The first open reads all the tabs and can take several seconds; the list is then kept for a few minutes. **Refresh from Google Sheet** reads the sheet again.
+5. **Age Calculator:** results appear as soon as the dates are picked, and each result has a Copy button. Dates are counted as whole days, like in Excel.
    - **Age:** `ROUND((Effectivity date - Birth date) / 365, 0)`
    - **Number of days:** `Date to - Date from`
    - **Number of months:** `ROUND((Date to - Date from) / (365 / 12), 0)`
    - A warning shows when the birth date is later than the effectivity date, or Date to is earlier than Date from.
-5. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
-6. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
+6. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
+7. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
 
 ## Small screens
 
 The page is built to work on a phone. On screens up to 700 px wide, buttons wrap their text and stay inside the screen, rows of buttons wrap onto a new line, and tables in the Administrator panel become cards. Password boxes have one eye button to show or hide the password (the browser's own eye icon is hidden). Do not name any element (id or class) starting with `ad`, `ads` or `banner`: some phone browsers with a built-in ad blocker hide such elements, which once hid a button. The Administrator panel uses the prefix `mg` instead.
+
+## Last loaded Google Sheet data
+
+Because reading the Google Sheets takes a while, these screens keep the **last data loaded** in the browser's local storage and show it right away, then read the sheet again in the background and replace it (the screen says "saved copy from ..." until the update arrives):
+
+- **Matrix of Commission:** the cooperative list and the last 30 cooperatives opened; the last cooperative opened is reopened automatically.
+- **Premium calculator:** the cooperative list from the commission matrix.
+- **Summary Report > FICCO Report** and **Other Coops Report:** the last loaded data and the selections.
+
+The saved copy belongs to the UA who loaded it (another UA logging in on the same browser does not see it). It stays after the tab is closed and after logging out, so the next visit starts fast. It is never a substitute for the sheet: the update always runs, and **Refresh** reads the sheet again from scratch. If the browser storage is full, the tool still works but cannot keep the copy.
 
 ## Page refresh
 

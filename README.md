@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.162
+**Current version:** v3.0.164
 
 ## Tools
 
@@ -28,13 +28,25 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
 5. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
 6. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
 
+## Page refresh
+
+Every tool keeps its last data when the page is refreshed (session storage of the browser tab). It is cleared on log out, when the session ends, or when the tab is closed.
+
+- **Letter Generator:** the open letter is restored (draft in local storage, cleared on log out). If a pasted picture is too big for the browser storage, the letter is still saved without the picture.
+- **Masterlist Generator:** plan, details and pasted members.
+- **Premium Calculator:** rates and settings, member rows, the open tab, pro-rated entries and the letter type picks.
+- **Age Calculator:** the four dates.
+- **Name Splitter:** the opened workbook (kept in the browser's IndexedDB), the ticked sheets, the chosen name columns and the options.
+- **Underwriting FAQ:** the search words, section filter and expand state.
+- **Summary Report:** see below.
+
 ## Summary Report
 
 The **Summary Report** button at the top (next to Underwriting Tools) opens a list of reports, like the Underwriting Tools list. Pick one to open it. The first report is **FICCO**, read from the FICCO monitoring Google Sheet (one tab per UA, named by initials such as JCTA).
 
 - Shows total net premium, total female, total male, total members and total premium adjustments, **per plan name** or **overall (by UA)**, with UA, plan and month filters.
 - Net premium is the PREMIUM total column of each month; adjustments are the ADJUSTMENTS column. Totals are added up from the branch and plan rows, not from the sheet's own total row.
-- **S.I and C.R monitoring:** one row per branch and plan with premium in the month (month block columns S.I No., S.I Date, C.R No., C.R Date). Rows with none are marked **No S.I** / **No C.R** as of the day the report was loaded, and can be filtered by status. The boxes also show total FICCO branches, total plans, S.I / C.R received and not received.
+- **S.I and C.R monitoring:** one row per branch and plan with premium in the month (month block columns S.I No., S.I Date, C.R No., C.R Date). Rows with none are marked **No S.I** / **No C.R** as of the day the report was loaded, and can be filtered by status or searched by S.I No., C.R No., branch, plan or UA. The boxes also show total FICCO branches, total plans, S.I / C.R received and not received.
 - **Deposits per month:** per UA and month, the deposited amount (Premium amount indicated in D.S) against the sheet's net premium with the difference, the date deposited (D.S date), date forwarded to treasury and date received by UA (Date received S.I from treasury). When a UA typed one date for the whole month it shows once; different dates show as first – last.
 - **Saved sheets:** type a name (for example FICCO 2027) and paste the Google Sheet link, then Save sheet. All UAs see the same saved list. Next year, save the new link and compare.
 - **Comparison:** month by month with the change from the previous month, and year to year against another saved sheet, for net premium, members, female, male or adjustments.

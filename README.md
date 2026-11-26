@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.167
+**Current version:** v3.0.168
 
 ## Tools
 
@@ -83,7 +83,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 - UAs log in with their name and password. Passwords are stored as hashed values, not readable text.
 - Users can change their own password (minimum 12 characters) from the account menu. Repeated wrong tries lock a name for a short time.
 - Sessions end after 24 hours without activity.
-- An Administrator panel (button on the login screen) lets the admin reset or unlock UA passwords, force log out, add or remove UAs, manage marketing contacts, approvers and bank accounts, and view the activity log.
+- An Administrator panel (button on the login screen) lets the admin reset or unlock UA passwords (on phones the Reset password section scrolls into view above the keyboard), force log out, add or remove UAs, manage marketing contacts, approvers and bank accounts, and view the activity log.
 
 ## How it works
 

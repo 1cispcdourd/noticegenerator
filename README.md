@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.169
+**Current version:** v3.0.170
 
 ## Tools
 
@@ -27,6 +27,10 @@ The **Underwriting Tools** button at the top opens a list of tool buttons. Pick 
    - A warning shows when the birth date is later than the effectivity date, or Date to is earlier than Date from.
 5. **Name Splitter:** upload an Excel masterlist (`.xlsx`, `.xlsm`) and download a copy with Surname, Extension, First name and Middle name columns added beside the original names. It runs in the browser; the file never leaves the computer. Old `.xls` files must be saved as `.xlsx` first.
 6. **Underwriting FAQ:** a searchable list of questions and answers from the Underwriting Department FAQ deck (LPPI plan), with a section filter.
+
+## Small screens
+
+The page is built to work on a phone. On screens up to 700 px wide, buttons wrap their text and stay inside the screen, rows of buttons wrap onto a new line, and tables in the Administrator panel become cards. Do not name any element (id or class) starting with `ad`, `ads` or `banner`: some phone browsers with a built-in ad blocker hide such elements, which once hid a button. The Administrator panel uses the prefix `mg` instead.
 
 ## Page refresh
 

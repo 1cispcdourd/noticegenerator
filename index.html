@@ -3187,7 +3187,10 @@ function mxPick(c,silent){MX.sel=c;cfg.coop=c.n;const q=$q("#pc_coopq");if(q)q.v
 function mxRestore(quiet){if(!cfg.coop)return;const c=MX.list.find(x=>x.n===cfg.coop);if(!c){if(!quiet)cfg.coop="";return}
  MX.sel=c;const q=$q("#pc_coopq");if(q&&!q.value)q.value=c.n;const x=$q("#pcCoopX");if(x)x.hidden=false;mxInfo(c)}
 function mxList(){const ls=$q("#pcCoopLs"),q=$q("#pc_coopq"),tk=mxNorm(MX.sel&&q.value===MX.sel.n?"":q.value).split(" ").filter(Boolean);
- const hit=MX.list.filter(c=>tk.every(t=>c.k.indexOf(t)>=0)),cut=hit.slice(0,60);MX.shown=cut;MX.act=cut.length&&tk.length?0:-1;
+ const qs=tk.join(" "),ws=c=>tk.every(t=>(" "+c.k).indexOf(" "+t)>=0);let hit=MX.list.filter(ws);
+ if(!hit.length)hit=MX.list.filter(c=>tk.every(t=>c.k.indexOf(t)>=0));
+ if(qs)hit=hit.map((c,i)=>[c.k.indexOf(qs)===0?0:1,i,c]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).map(x=>x[2]);
+ const cut=hit.slice(0,60);MX.shown=cut;MX.act=cut.length&&tk.length?0:-1;
  ls.innerHTML=cut.map((c,i)=>'<li role="option" id="pcCo'+i+'" data-i="'+i+'"'+(i===MX.act?' class="on"':'')+'>'+esc(c.n)+"</li>").join("")+(hit.length>60?'<li class="mo" aria-hidden="true">'+(hit.length-60)+" more, keep typing to narrow the list</li>":"")+(hit.length?"":'<li class="mo">No cooperative found. Check the spelling or type fewer words.</li>');
  ls.hidden=false;q.setAttribute("aria-expanded","true")}
 function mxClose(){const ls=$q("#pcCoopLs"),q=$q("#pc_coopq");if(ls)ls.hidden=true;if(q)q.setAttribute("aria-expanded","false")}

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.165
+**Current version:** v3.0.166
 
 ## Tools
 
@@ -46,7 +46,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 
 - Shows total net premium, total female, total male, total members and total premium adjustments, **per plan name** or **overall (by UA)**, with UA, plan and month filters.
 - Net premium is the PREMIUM total column of each month; adjustments are the ADJUSTMENTS column. Totals are added up from the branch and plan rows, not from the sheet's own total row.
-- **S.I and C.R monitoring:** one row per branch and plan with premium in the month (month block columns S.I No., S.I Date, C.R No., C.R Date). Pick a **Branch** (with the Month filter and the Saved sheet as the year) to see whether that branch already has its S.I / C.R. Rows with none are marked **No S.I** / **No C.R** as of the day the report was loaded, and can be filtered by status or searched by S.I No., C.R No., branch, plan or UA. The boxes also show total FICCO branches, total plans, S.I / C.R received and not received.
+- **S.I and C.R monitoring:** one row per branch and plan with premium in the month (month block columns S.I No., S.I Date, C.R No., C.R Date). Pick the **Year** (saved sheet), **Month** and **Branch** in the box to see whether that branch already has its S.I / C.R (they are the same choices as the Saved sheet and Month at the top). Rows with none are marked **No S.I** / **No C.R** as of the day the report was loaded, and can be filtered by status or searched by S.I No., C.R No., branch, plan or UA. The boxes also show total FICCO branches, total plans, S.I / C.R received and not received.
 - **Deposits per month:** per UA and month, the deposited amount (Premium amount indicated in D.S) against the sheet's net premium with the difference, the date deposited (D.S date), date forwarded to treasury and date received by UA (Date received S.I from treasury). When a UA typed one date for the whole month it shows once; different dates show as first – last.
 - **Saved sheets:** type a name (for example FICCO 2027) and paste the Google Sheet link, then Save sheet. All UAs see the same saved list. Next year, save the new link and compare.
 - **Comparison:** month by month with the change from the previous month, and year to year against another saved sheet, for net premium, members, female, male or adjustments.

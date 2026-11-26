@@ -3261,10 +3261,13 @@ function grid(){const p=PL[X.plan],sp=p.sp;
  +inp("rn","Reference number",0,"e.g. 2311")+inp("rd","Reference date",0,"mm/dd/yyyy")+inp("paid","Total premium paid",0,"e.g. 548,080.00")
  +(sp?inp("mo","Month of remittance",0,"e.g. SEPTEMBER 2026"):"")+inp("ua","Underwriting Analyst (prepared by)",0,"Full name");
  root.querySelector("#mlC").textContent="Columns in order: "+p.f.map((f,i)=>(i+1)+". "+f[1]).join(" | ")}
-grid();T.value=X.txt;
+let MLAU="";
+function mlUA(){const u=AUTH.user;if(!u||u===MLAU)return;if(!X.ua||X.ua===MLAU)X.ua=u;MLAU=u;const e=G.querySelector("#ml_ua");if(e&&e.value!==X.ua)e.value=X.ua}
+grid();mlUA();T.value=X.txt;
+["click","focusin","pointerdown"].forEach(ev=>root.addEventListener(ev,mlUA,true));setTimeout(mlUA,600);
 root.addEventListener("input",mlM.later);root.addEventListener("change",mlM.later);root.addEventListener("click",mlM.later);
 G.addEventListener("input",e=>{const k=e.target.dataset.k;if(k)X[k]=e.target.value});
-G.addEventListener("change",e=>{if(e.target.dataset.k=="plan"){X.plan=e.target.value;grid();M.textContent=""}});
+G.addEventListener("change",e=>{if(e.target.dataset.k=="plan"){X.plan=e.target.value;grid();mlUA();M.textContent=""}});
 T.addEventListener("input",()=>{X.txt=T.value;M.textContent="";M.classList.remove("err")});
 root.querySelector("#mlX").onclick=()=>{T.value=X.txt="";M.textContent=""};
 const num=v=>{const s=String(v==null?"":v).replace(/[₱,\s]/g,"");if(s==="")return null;const n=Number(s);return isNaN(n)?NaN:n};

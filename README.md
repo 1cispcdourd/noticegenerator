@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.160
+**Current version:** v3.0.162
 
 ## Tools
 
@@ -34,14 +34,16 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 
 - Shows total net premium, total female, total male, total members and total premium adjustments, **per plan name** or **overall (by UA)**, with UA, plan and month filters.
 - Net premium is the PREMIUM total column of each month; adjustments are the ADJUSTMENTS column. Totals are added up from the branch and plan rows, not from the sheet's own total row.
+- **S.I and C.R monitoring:** one row per branch and plan with premium in the month (month block columns S.I No., S.I Date, C.R No., C.R Date). Rows with none are marked **No S.I** / **No C.R** as of the day the report was loaded, and can be filtered by status. The boxes also show total FICCO branches, total plans, S.I / C.R received and not received.
+- **Deposits per month:** per UA and month, the deposited amount (Premium amount indicated in D.S) against the sheet's net premium with the difference, the date deposited (D.S date), date forwarded to treasury and date received by UA (Date received S.I from treasury). When a UA typed one date for the whole month it shows once; different dates show as first – last.
 - **Saved sheets:** type a name (for example FICCO 2027) and paste the Google Sheet link, then Save sheet. All UAs see the same saved list. Next year, save the new link and compare.
 - **Comparison:** month by month with the change from the previous month, and year to year against another saved sheet, for net premium, members, female, male or adjustments.
 - **Page refresh:** the last loaded data, the open report and the filters are kept for the browser tab (session storage) and shown at once after a refresh while the numbers update in the background. They are cleared on log out or when the session ends.
 - **Refresh** reads the sheet again; auto-refresh runs every 5 minutes while the page is open.
 - **Other Coops** (second item in the Summary Report list): production of the other coops, combined from the saved Google Sheet files. Every sheet tab (visible or hidden) that has the production columns is added together, found by its header names. Region 13 (under marketing Rosalina D. Martinez and Erwin M. Martinez) comes first; add Region 10, Region 9, BARMM and others by typing a name and region and pasting their Google Sheet link, then Save sheet.
-  - Shows gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing, per region or per UA**, with region, UA, marketing, plan, year and month filters. The UA is read from the sheet's UA column (initials or name): JLJS, JCTA, KRMO (or KRO), HCOO (or HCO); blanks and anything else count as Others. Sheets made of several tabs are combined; tabs without the coop / gross premium headers are listed under the table.
+  - Shows total A.R. received (number of A.R. rows), A.R. processed (rows with a Male or Female count) and A.R. pending (received less processed), plus gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing, per region or per UA**, with region, UA, marketing, plan, year and month filters. The UA is read from the sheet's UA column (initials or name): JLJS, JCTA, KRMO (or KRO), HCOO (or HCO); blanks and anything else count as Others. Sheets made of several tabs are combined; tabs without the coop / gross premium headers are listed under the table.
   - The month is the A.R. date. Members come from the Male count and Female count columns, so rows not yet processed by Underwriting show 0.
-  - Comparison: month by month and year against year, for net premium, gross premium, service fee, members, female or male.
+  - Comparison: month by month and year against year, for net premium, gross premium, service fee, members, female, male, A.R. received, processed or pending.
 - The Google Apps Script reads the sheet, so the sheet needs no public sharing. Share it with the Google account that owns the script, paste the new `directory-apps-script.gs`, run **authorizeSheets** once, then deploy a new version.
 
 ## Letter Generator
@@ -59,6 +61,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 
 - **Version changes:** click the version number at the top of the page to see the short change log.
 - **Account menu:** after login, a "Welcome! (your name)" pill appears at the top right. Click it to open **Change password** or **Log out**.
+- On small screens the Preview button scrolls to the letter preview. A failed or slow check of the login session (common on phones) no longer logs you out; only a confirmed ended session does.
 - On small screens the subtitle is hidden, the header items wrap, and on phones and short screens the header stops sticking, so the letter has more room.
 
 ## Login and administration

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.166
+**Current version:** v3.0.167
 
 ## Tools
 
@@ -77,6 +77,8 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 - On small screens the subtitle is hidden, the header items wrap, and on phones and short screens the header stops sticking, so the letter has more room.
 
 ## Login and administration
+
+- While logged out, the login box is the only thing on the page: every tool is hidden and the page cannot be scrolled behind it (also on phones).
 
 - UAs log in with their name and password. Passwords are stored as hashed values, not readable text.
 - Users can change their own password (minimum 12 characters) from the account menu. Repeated wrong tries lock a name for a short time.

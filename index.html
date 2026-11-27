@@ -442,6 +442,9 @@ body.lk #srDd{display:none}
 #pcApp .pc-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 10px}
 #pcApp .pc-tabs button{border-radius:999px;font-weight:600;font-size:13px;padding:6px 14px}
 #pcApp .pc-tabs button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+/* v3.0.183: count badge on the Underpayment / Overpayment / Late remittance tabs */
+#pcApp .pc-tabs button .pc-bd{display:inline-block;min-width:18px;height:18px;line-height:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:#d92d20;color:#fff;font-size:11px;font-weight:700;text-align:center;vertical-align:1px;box-sizing:border-box}
+#pcApp .pc-tabs button.on .pc-bd{background:#fff;color:var(--ac)}
 #pcApp #pcMsg{min-height:1.4em;font-size:13px;color:var(--mu);margin:0 0 10px}
 #pcApp #pcMsg.err{color:var(--ns-err);font-weight:600}
 #pcApp .pc-box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin:0 0 14px}
@@ -2108,7 +2111,8 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.182",date:"2026-11-27",cur:1,groups:[{k:"Fixed",i:["Premium calculator: Send to letter generator on the Overpayment tab now also sends each member\u2019s effectivity and expiry date, so the Coverage Period (From / To) of the refund table is filled."]}]},
+ {v:"3.0.183",date:"2026-11-27",cur:1,groups:[{k:"Added",i:["Premium calculator: the Underpayment, Overpayment and Late remittance tabs show a small count of the members in them, so you can see at a glance that there is something to review."]}]},
+ {v:"3.0.182",date:"2026-11-27",groups:[{k:"Fixed",i:["Premium calculator: Send to letter generator on the Overpayment tab now also sends each member\u2019s effectivity and expiry date, so the Coverage Period (From / To) of the refund table is filled."]}]},
  {v:"3.0.181",date:"2026-11-27",groups:[{k:"Changed",i:["Letter form: fields in two columns on wide screens."]}]},
  {v:"3.0.180",date:"2026-11-27",groups:[{k:"Changed",i:["Premium calculator and Masterlist Generator: boxes sit side by side on wide screens."]}]},
  {v:"3.0.179",date:"2026-11-27",groups:[{k:"Changed",i:["Letter Generator: the form takes half the page and the preview the other half."]}]},
@@ -2980,7 +2984,12 @@ function paintMsg(){const T=R.T,m=[];
  if(T.bad)m.push(T.bad+" row"+(T.bad>1?"s need":" needs")+" attention (see the Note column).");
  const el=root.querySelector("#pcMsg");el.textContent=m.join(" ");el.classList.toggle("err",!!T.bad)}
 function card(l,v,s,cl){return'<div class="pc-c'+(cl?" "+cl:"")+'"><span>'+l+'</span><b>'+(v===""||v==null?"&ndash;":v)+'</b>'+(s?'<em>'+s+'</em>':'')+'</div>'}
-function paintSum(){const T=R.T,el=root.querySelector("#pcSum");if(!el)return;
+function paintBadges(){try{const n={under:items("under").length,over:items("over").length,late:lateItems().length},nm={under:"Underpayment",over:"Overpayment",late:"Late remittance"};
+ Object.keys(n).forEach(k=>{const b=root.querySelector('[data-tab="'+k+'"]');if(!b)return;let s=b.querySelector(".pc-bd");
+  if(!n[k]){if(s)s.remove();b.removeAttribute("aria-label");b.removeAttribute("title");return}
+  if(!s){s=document.createElement("span");s.className="pc-bd";s.setAttribute("aria-hidden","true");b.appendChild(s)}
+  s.textContent=n[k];const t=n[k]+(n[k]===1?" member":" members")+" \u2013 "+nm[k];b.title=t;b.setAttribute("aria-label",nm[k]+", "+n[k]+(n[k]===1?" member":" members"))})}catch(e){}}
+function paintSum(){paintBadges();const T=R.T,el=root.querySelector("#pcSum");if(!el)return;
  const st=T.status?'<span class="pc-st '+(T.status==="LATE"?"late":T.status==="OK"?"ok":"")+'">'+stt(T.status)+'</span>':"";
  el.innerHTML='<div class="pc-cards">'
  +card("Total borrowers",T.count||"","")+card("Total sum insured",f2(T.si),"")

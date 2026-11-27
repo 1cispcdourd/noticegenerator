@@ -549,11 +549,11 @@ body.lk #pcApp{display:none!important}
 <div id="srO" hidden>
 <p class="sr-mut">Production of the other coops, combined from the Google Sheet files saved below (every sheet tab with the production columns is added together). Months follow the A.R. date. Members come from the Male / Female count columns, so rows not yet processed by Underwriting show 0. A.R. received is the number of A.R.s with a Date Received (an A.R. spread over several rows counts once); processed means the A.R. has a Date Processed; pending is received less processed.</p>
 <div class="sr-card"><div class="sr-row">
-<label>Saved sheets<select id="ocSrc"></select></label>
+<label>Saved sheets (all are combined)<select id="ocSrc"></select></label>
 <button type="button" class="sr-b" id="ocRef">Refresh</button>
 <label class="sr-mut" style="flex-direction:row;align-items:center;gap:6px;font-weight:400;white-space:nowrap"><input type="checkbox" id="ocAuto" checked> Auto-refresh every 5 min</label>
 <button type="button" class="sr-b" id="ocDel" hidden>Remove sheet</button></div>
-<p class="sr-mut" style="margin:8px 0 0">The Google Sheet links are saved by the Administrator.</p><div class="sr-row" style="margin-top:10px" hidden><label>Name (e.g. Region 10 2026)<input type="text" id="ocNm" maxlength="40"></label>
+<p class="sr-mut" style="margin:8px 0 0">The Google Sheet links are saved by the Administrator.</p><p class="sr-mut" id="ocSrcSt" style="margin:6px 0 0"></p><div class="sr-row" style="margin-top:10px" hidden><label>Name (e.g. Region 10 2026)<input type="text" id="ocNm" maxlength="40"></label>
 <label>Region<input type="text" id="ocRg" list="ocRgL" maxlength="30" placeholder="Region 13"><datalist id="ocRgL"><option value="Region 13"><option value="Region 10"><option value="Region 9"><option value="BARMM"></datalist></label>
 <label>Google Sheet link<input type="text" id="ocLk" class="sr-lk" placeholder="https://docs.google.com/spreadsheets/d/..."></label><button type="button" class="sr-b" id="ocAdd">Save sheet</button></div>
 <div id="ocMsg" class="sr-msg"></div></div>
@@ -2314,7 +2314,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
   setTimeout(()=>location.reload(),rm?500:1900);
  });
 })();
-try{const APP_VER="v3.0.189";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
+try{const APP_VER="v3.0.190";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
 /* v3.0.108: restore the last draft after a refresh */
 try{if(PREV){const d=safeParse(PREV);if(d&&typeof d=="object"){Object.assign(S,d);S.pick=true;if(S.rt=="B.S. No."||S.rt=="O.R. No.")S.rt="A.R. No.";form();render()}}}catch(e){}
 </script>
@@ -3390,7 +3390,7 @@ const SELS=["ocView","ocReg","ocUa","ocMk","ocPlan","ocYr","ocMon","ocMet","ocCm
 let dirty=false;const saveSel=()=>{try{const sel={};SELS.forEach(i=>sel[i]=$("#"+i).value);localStorage.setItem(CK+"_s",JSON.stringify(sel))}catch(e){}};
 const saveC=()=>{try{if(!ALL.length)return;if(!dirty){saveSel();return}dirty=false;const sel={};SELS.forEach(i=>sel[i]=$("#"+i).value);localStorage.setItem(CK,JSON.stringify({u:AUTH.user,src:SRC,all:ALL,info:INFO,at:at&&at.toISOString(),sel,saved:Date.now()}))}catch(e){}};
 function restore(){try{const c=JSON.parse(localStorage.getItem(CK)||"null");if(!c||c.u!==AUTH.user||!Array.isArray(c.all)||!c.all.length)return false;
- SRC=c.src||[];ALL=c.all;ALL.forEach(r=>{r[2]=mkn(r[2])});INFO=c.info||[];at=c.at?new Date(c.at):null;opts($("#ocSrc"),SRC.map(s=>[s.id,s.label+(s.region?" \u2013 "+s.region:"")]));filters();
+ SRC=c.src||[];ALL=c.all;ALL.forEach(r=>{r[2]=mkn(r[2])});INFO=c.info||[];at=c.at?new Date(c.at):null;opts($("#ocSrc"),SRC.map(s=>[s.id,s.label+(s.region?" \u2013 "+s.region:"")]));paintSrc();filters();
  let sl=null;try{sl=JSON.parse(localStorage.getItem(CK+"_s")||"null")}catch(e){}if(sl)c.sel=sl;
  SELS.forEach(i=>{const el=$("#"+i),v=c.sel&&c.sel[i];if(el&&v!=null&&[...el.options].some(o=>o.value===v))el.value=v});render();return true}catch(e){return false}}
 const logged=()=>typeof AUTH!=="undefined"&&AUTH.tok,on=()=>window.srRep==="oc"&&!app.classList.contains("tool-off");
@@ -3428,11 +3428,19 @@ function compare0(){const m=$("#ocMet").value,dec=/^[NGS]$/.test(m),b=$("#ocCmp"
  const f=v=>v==null?"–":dec?n2(v):n0(v);let h='<div class="sr-wrap"><table><thead><tr><th>Month</th><th>'+a+"</th><th>vs previous month</th>"+(b?"<th>"+b+"</th><th>Difference</th>":"")+"</tr></thead><tbody>",ta=0,tb=0;
  for(let i=0;i<12;i++){if(A[i]==null&&B[i]==null)continue;ta+=A[i]||0;tb+=B[i]||0;h+="<tr><td>"+MN[i]+"</td><td>"+f(A[i])+"</td><td>"+(i&&A[i-1]!=null?pc(A[i],A[i-1]):"")+"</td>"+(b?"<td>"+f(B[i])+"</td><td>"+(A[i]!=null&&B[i]!=null?pc(A[i],B[i]):"")+"</td>":"")+"</tr>"}
  $("#ocCmpT").innerHTML=h+'<tr class="sr-t"><td>Total</td><td>'+f(ta)+"</td><td></td>"+(b?"<td>"+f(tb)+"</td><td>"+pc(ta,tb)+"</td>":"")+"</tr></tbody></table></div>"}
-async function loadAll(force){if(!SRC.length){ALL=[];INFO=[];filters();render();return}say("Loading from Google Sheets…");$("#ocRef").disabled=true;const rows=[],info=[];let err="";
- for(const s of SRC){const r=await call("ocprod",{id:s.id,force:!!force});
-  if(r&&r.ok){const oldS=r.rows.length&&r.rows[0].length<13;r.rows.forEach(x=>{const rv=+x[11]||0,pr=+x[12]||0,rf=+x[13]||0;x.length=Math.min(x.length,11);while(x.length<11)x.push("Others");x[2]=mkn(x[2]);x.push(s.region||s.label,rv,pr,rf);rows.push(x)});info.push({noar:!!oldS,label:s.label,region:s.region||s.label,tabs:r.tabs||[],skipped:r.skipped||[],noua:r.noua||[],uw:r.uw||[],bad:r.bad,nodate:r.nodate})}
-  else err+=(err?" ":"")+s.label+": "+(!r?"no answer from Google Apps Script (slow or blocked), press Refresh.":r.error==="sheet"?"the script cannot read this Google Sheet. Share it with the Google account that runs the script, run authorizeSheets once, then deploy a new version. "+(r.detail||""):"could not load ("+(r.error||"error")+").")}
- $("#ocRef").disabled=false;ALL=rows;INFO=info;at=new Date();dirty=true;say(err,!!err);filters();render()}
+function paintSrc(st){const el=$("#ocSrcSt");if(!el)return;el.innerHTML=SRC.length?"Combined: "+SRC.map((s,i)=>E(s.label)+(st?(st[i]===1?" \u2713":st[i]===2?" \u2717":" \u2026"):(INFO.some(x=>x.label===s.label)?" \u2713":""))).join(" \u00b7 "):""}
+async function loadAll(force){if(!SRC.length){ALL=[];INFO=[];paintSrc();filters();render();return}
+ const n=SRC.length,st=SRC.map(()=>0),res=SRC.map(()=>null),errs=SRC.map(()=>""),early=!ALL.length;
+ say("Loading "+n+" saved sheet"+(n>1?"s":"")+" from Google Sheets\u2026");$("#ocRef").disabled=true;paintSrc(st);
+ const merge=()=>{const rows=[],info=[];SRC.forEach((s,i)=>{const r=res[i];if(!r)return;const oldS=r.rows.length&&r.rows[0].length<13;
+   r.rows.forEach(x=>{x=x.slice();const rv=+x[11]||0,pr=+x[12]||0,rf=+x[13]||0;x.length=Math.min(x.length,11);while(x.length<11)x.push("Others");x[2]=mkn(x[2]);x.push(s.region||s.label,rv,pr,rf);rows.push(x)});
+   info.push({noar:!!oldS,label:s.label,region:s.region||s.label,tabs:r.tabs||[],skipped:r.skipped||[],noua:r.noua||[],uw:r.uw||[],bad:r.bad,nodate:r.nodate})});
+  ALL=rows;INFO=info;filters();render()};
+ // all saved sheets are asked at the same time; on a first load each one shows as soon as it arrives
+ await Promise.all(SRC.map(async(s,i)=>{const r=await call("ocprod",{id:s.id,force:!!force});
+  if(r&&r.ok){res[i]=r;st[i]=1}else{st[i]=2;errs[i]=s.label+": "+(!r?"no answer from Google Apps Script (slow or blocked), press Refresh.":r.error==="sheet"?"the script cannot read this Google Sheet. Share it with the Google account that runs the script, run authorizeSheets once, then deploy a new version. "+(r.detail||""):"could not load ("+(r.error||"error")+").")}
+  paintSrc(st);if(early&&res[i]){at=new Date();merge()}}));
+ $("#ocRef").disabled=false;if(!early||!ALL.length)merge();at=new Date();dirty=true;const err=errs.filter(Boolean).join(" ");say(err,!!err);paintSrc(st);saveC()}
 async function start(){if(started||!logged())return;started=true;say(restore()?"Showing the last saved data, updating\u2026":"Loading\u2026 the first load can take a while");const r=await call("ocsrc");
  if(!(r&&r.ok&&Array.isArray(r.sources))){started=false;say(r&&r.error==="action"?"Update the Google Apps Script to v3.0.158 and deploy a new version.":"Could not reach the shared data. Check the connection and try again.",1);return}
  SRC=r.sources;opts($("#ocSrc"),SRC.map(s=>[s.id,s.label+(s.region?" – "+s.region:"")]));await loadAll();

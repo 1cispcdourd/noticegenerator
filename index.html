@@ -2314,7 +2314,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
   setTimeout(()=>location.reload(),rm?500:1900);
  });
 })();
-try{const APP_VER="v3.0.192";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
+try{const APP_VER="v3.0.193";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
 /* v3.0.108: restore the last draft after a refresh */
 try{if(PREV){const d=safeParse(PREV);if(d&&typeof d=="object"){Object.assign(S,d);S.pick=true;if(S.rt=="B.S. No."||S.rt=="O.R. No.")S.rt="A.R. No.";form();render()}}}catch(e){}
 </script>
@@ -3414,7 +3414,7 @@ function filters(){opts($("#ocReg"),[["*","All regions"]].concat(uniq(11).map(x=
  opts($("#ocCmp"),[["","No comparison"]].concat(ys.map(y=>[String(y),String(y)])),1)}
 const base=()=>{const rg=$("#ocReg").value,k=$("#ocMk").value,p=$("#ocPlan").value,u=$("#ocUa").value;return ALL.filter(r=>(rg==="*"||r[11]===rg)&&(u==="*"||r[10]===u)&&(k==="*"||r[2]===k)&&(p==="*"||r[0]===p))};
 function render(){const y=$("#ocYr").value,mo=$("#ocMon").value,rows=base().filter(r=>(y==="*"||r[3]===+y)&&(mo==="*"||r[4]===+mo)),T=sum(rows);
- $("#ocKpi").innerHTML=[["Total A.R. received",n0(T.R)],["Total A.R. processed",n0(T.P)],["Total A.R. pending",n0(T.R-T.P)],["Original gross premium (A.R. amount)",n2(T.O)],["Approved total sum insured",n2(T.T)],["Approved gross premium",n2(T.G)],["Approved service fee",n2(T.S)],["Approved net premium",n2(T.N)],["Total female",n0(T.F)],["Total male",n0(T.M)],["Total members",n0(T.M+T.F)],["Refund / other",n0(T.Rf)]].map(k=>'<div class="sr-k"><span>'+k[0]+"</span><b>"+k[1]+"</b></div>").join("");
+ $("#ocKpi").innerHTML=[["Total A.R. received",n0(T.R)],["Total A.R. processed",n0(T.P)],["Total A.R. pending",n0(T.R-T.P)],["Original gross premium",n2(T.O)],["Approved total sum insured",n2(T.T)],["Approved gross premium",n2(T.G)],["Approved service fee",n2(T.S)],["Approved net premium",n2(T.N)],["Total female",n0(T.F)],["Total male",n0(T.M)],["Total members",n0(T.M+T.F)],["Refund / other",n0(T.Rf)]].map(k=>'<div class="sr-k"><span>'+k[0]+"</span><b>"+k[1]+"</b></div>").join("");
  const v=$("#ocView").value,g={};rows.forEach(r=>{const k=v==="plan"?r[0]:v==="coop"?r[1]:v==="mkt"?mk(r):v==="ua"?r[10]:r[11];(g[k]=g[k]||[]).push(r)});
  const all=Object.keys(g).map(k=>[k,sum(g[k])]).sort((a,b)=>v==="ua"?UAO.indexOf(a[0])-UAO.indexOf(b[0]):b[1].N-a[1].N),cut=all.slice(0,300);
  const body=cut.map(([k,s])=>"<tr><td>"+E(v==="ua"?uan(k):k)+"</td><td>"+n0(s.R)+"</td><td>"+n0(s.P)+"</td><td>"+n0(s.R-s.P)+"</td><td>"+n0(s.M)+"</td><td>"+n0(s.F)+"</td><td>"+n0(s.M+s.F)+"</td><td>"+n0(s.Rf)+"</td><td>"+n2(s.O)+"</td><td>"+n2(s.T)+"</td><td>"+n2(s.G)+"</td><td>"+n2(s.S)+"</td><td>"+n2(s.N)+"</td></tr>").join("");

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.186
+**Current version:** v3.0.189
 
 ## Tools
 
@@ -87,7 +87,7 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 - **Page refresh:** the last loaded data, the open report and the filters are kept for the browser tab (session storage) and shown at once after a refresh while the numbers update in the background. They are cleared on log out or when the session ends.
 - **Refresh** reads the sheet again; auto-refresh runs every 5 minutes while the page is open.
 - **Other Coops** (second item in the Summary Report list): production of the other coops, combined from the saved Google Sheet files. Every sheet tab (visible or hidden) that has the production columns is added together, found by its header names. The header row is searched in the first 40 rows of each tab (Region 9 and 10 have a title block, so their headers are on row 8), so new tabs, new rows, inserted columns and a moved header row are picked up on the next refresh without any change to the script. A tab is read when it has **COOP NAME** (or COOPERATIVE'S NAME) and **GROSS PREMIUM** headers; other tabs, such as Voucher, are listed as not read. The A.R. date can be a real date, a number or text such as `1.12.26`, `03.20.2026` or `3/20//26`; if it cannot be read, the date received is used. The UA is read from the UA column or **UA ASSIGN**, and Male / Female from **MALE COUNT** / **FEMALE COUNT** or **PER UA NO. OF APPROVED MALE / FEMALE MEMBERS**. Where the CSA left Gross premium, Service fee or Net premium empty, the AS PER UA amounts are used. TOTAL and PREPARED BY lines under the table are ignored. The saved link must be a Google Sheet (an Excel file uploaded to Drive must first be opened and saved as a Google Sheet). Region 13 (under marketing Rosalina D. Martinez and Erwin M. Martinez) comes first; the Administrator adds Region 10, Region 9, BARMM and others (name, region and Google Sheet link) in Administrator panel > Sheet links.
-  - Shows total A.R. received (number of A.R. rows), A.R. processed (rows with a Male or Female count) and A.R. pending (received less processed), plus gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing, per region or per UA**, with region, UA, marketing, plan, year and month filters. The UA is read from the sheet's UA column (initials or name): JLJS, JCTA, KRMO (or KRO), HCOO (or HCO); blanks and anything else count as Others. Sheets made of several tabs are combined; tabs without the coop / gross premium headers are listed under the table.
+  - Shows total A.R. received (A.R.s whose Date Received or Time Received is filled), A.R. processed (A.R.s whose Date Processed is filled), Refund / other (the Refund Count column) and A.R. pending (received less processed), plus gross premium, coop service fee, net premium, male, female and members, **per plan, per coop, per marketing, per region or per UA**, with region, UA, marketing, plan, year and month filters. The UA is read from the sheet's UA column (initials or name): JLJS, JCTA, KRMO (or KRO), HCOO (or HCO); blanks and anything else count as Others. Sheets made of several tabs are combined; tabs without the coop / gross premium headers are listed under the table.
   - The month is the A.R. date. Members come from the Male count and Female count columns, so rows not yet processed by Underwriting show 0.
   - Comparison: month by month and year against year, for net premium, gross premium, service fee, members, female, male, A.R. received, processed or pending.
 - The Google Apps Script (v3.0.167) reads the sheet, so the sheet needs no public sharing. Share it with the Google account that owns the script, paste the new `directory-apps-script.gs`, run **authorizeSheets** once, then deploy a new version.
@@ -106,7 +106,6 @@ The **Summary Report** button at the top (next to Underwriting Tools) opens a li
 
 ## Header
 
-- **Version changes:** click the version number at the top of the page to see the short change log.
 - **Account menu:** after login, a "Welcome! (your name)" pill appears at the top right. Click it to open **Change password** or **Log out**.
 - On small screens the Preview button scrolls to the letter preview. A failed or slow check of the login session (common on phones) no longer logs you out; only a confirmed ended session does.
 - On small screens the subtitle is hidden, the header items wrap, and on phones and short screens the header stops sticking, so the letter has more room.
@@ -159,7 +158,7 @@ To change the shared data connection, set up the Google Sheet and Apps Script fr
 
 ## Changing the tool
 
-Each change bumps the version number (the version button and the page title follow it) and adds one short line to the change log (the `CHANGELOG` list in `index.html`).
+Each change bumps the version number, which is set in one place in `index.html` (`APP_VER`, used for the page title and the login box). There is no change log inside the page.
 
 ## Notes
 

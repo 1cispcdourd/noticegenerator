@@ -547,7 +547,7 @@ body.lk #pcApp{display:none!important}
 <label>Measure<select id="srMet"><option value="P">Net premium</option><option value="X">Members (M + F)</option><option value="F">Female</option><option value="M">Male</option><option value="A">Premium adjustments</option></select></label>
 <label>Compare with (year to year)<select id="srCmp"></select></label></div></div><div id="srCmpT"></div></div>
 <div id="srO" hidden>
-<p class="sr-mut">Production of the other coops, combined from the Google Sheet files saved below (every sheet tab with the production columns is added together). Months follow the A.R. date. Members come from the Male / Female count columns, so rows not yet processed by Underwriting show 0. A.R. received is the number of A.R.s with a Date Received (an A.R. spread over several rows counts once); processed means the A.R. has a Date Processed; pending is received less processed.</p>
+<p class="sr-mut">Production of the other coops, combined from the Google Sheet files saved below (every visible sheet tab with the production columns is added together; hidden tabs are skipped). Months follow the A.R. date. Members come from the Male / Female count columns, so rows not yet processed by Underwriting show 0. A.R. received is the number of A.R.s with a Date Received (an A.R. spread over several rows counts once); processed means the A.R. has a Date Processed; pending is received less processed.</p>
 <div class="sr-card"><div class="sr-row">
 <label>Saved sheets (all are combined)<select id="ocSrc"></select></label>
 <button type="button" class="sr-b" id="ocRef">Refresh</button>
@@ -2314,7 +2314,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
   setTimeout(()=>location.reload(),rm?500:1900);
  });
 })();
-try{const APP_VER="v3.0.190";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
+try{const APP_VER="v3.0.191";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
 /* v3.0.108: restore the last draft after a refresh */
 try{if(PREV){const d=safeParse(PREV);if(d&&typeof d=="object"){Object.assign(S,d);S.pick=true;if(S.rt=="B.S. No."||S.rt=="O.R. No.")S.rt="A.R. No.";form();render()}}}catch(e){}
 </script>

@@ -2108,7 +2108,8 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
 <div class="cl-ov" id="clOv"><div class="cl-box" role="dialog" aria-modal="true" aria-labelledby="clTt"><div class="cl-hd"><h3 id="clTt">Version changes</h3><button type="button" class="cl-x" id="clX" aria-label="Close">&times;</button></div><div class="cl-bd" id="clBd" tabindex="0"></div><div class="cr cl-cr">Developed by Daigo · © 2026 Daigo. All rights reserved.</div></div></div>
 <script>
 const CHANGELOG=[
- {v:"3.0.181",date:"2026-11-27",cur:1,groups:[{k:"Changed",i:["Letter form: fields in two columns on wide screens."]}]},
+ {v:"3.0.182",date:"2026-11-27",cur:1,groups:[{k:"Fixed",i:["Premium calculator: Send to letter generator on the Overpayment tab now also sends each member\u2019s effectivity and expiry date, so the Coverage Period (From / To) of the refund table is filled."]}]},
+ {v:"3.0.181",date:"2026-11-27",groups:[{k:"Changed",i:["Letter form: fields in two columns on wide screens."]}]},
  {v:"3.0.180",date:"2026-11-27",groups:[{k:"Changed",i:["Premium calculator and Masterlist Generator: boxes sit side by side on wide screens."]}]},
  {v:"3.0.179",date:"2026-11-27",groups:[{k:"Changed",i:["Letter Generator: the form takes half the page and the preview the other half."]}]},
  {v:"3.0.178",date:"2026-11-27",groups:[{k:"Changed",i:["Tool pages use the full page width; Matrix of Commission and Underwriting FAQ show 2 columns on wide screens."]}]},
@@ -3031,12 +3032,14 @@ const LT=[["uI","Underpayment \u2013 Individual (substandard rate)"],["uS","Unde
 const LTO=[["ov","Premium Refund \u2013 Overpayment (individual)"]];
 let sendTy={under:"",over:""};
 if(PCSV&&PCSV.sendTy&&typeof PCSV.sendTy=="object"){["under","over"].forEach(k=>{if(typeof PCSV.sendTy[k]=="string")sendTy[k]=PCSV.sendTy[k]})}
+/* v3.0.182: effectivity / expiry from the calculator as yyyy-mm-dd, the format the letter's Coverage from / to boxes use */
+function isoD(v){const t=PCX.fmtDate(v);const m=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(t||"");return m?m[3]+"-"+m[1]+"-"+m[2]:""}
 function sendToLetter(kind){
  kind=kind==="over"?"over":kind==="late"?"late":"under";
  const msg=root.querySelector("#pcMsg"),ty=kind==="late"?"lt":(root.querySelector("#pcLt_"+kind)||{}).value||(kind==="over"?"ov":"uS");
  const arTxt=String(cfg.arno||"").trim()?String(cfg.arno).trim()+" dated "+PCX.fmtDate(R.T.to):"";
  const list=(kind==="late"?lateItems():items(kind)).map(i=>{const o=R.res[i];return kind==="late"?{name:pcs(nm(rows[i])),ar:arTxt,eff:PCX.fmtDate(o.ef),days:(R.T.to-o.ef)+" days"}:kind==="over"
-  ?{name:pcs(nm(rows[i])),age:String(o.age),term:String(o.term),si:String(o.si),correct:o.corr.toFixed(2),paid:String(o.paid)}
+  ?{name:pcs(nm(rows[i])),age:String(o.age),term:String(o.term),si:String(o.si),correct:o.corr.toFixed(2),paid:String(o.paid),cfrom:isoD(o.ef),cto:isoD(o.ex)}
   :{name:pcs(nm(rows[i])),age:String(o.age),rate:ty==="uI"?o.mult.toFixed(2):fr(o.tot),term:String(o.term),orig:String(o.si),correct:o.corr.toFixed(2),paid:String(o.paid)}});
  if(!list.length||typeof window.uwnFromCalc!=="function"){msg.hidden=false;msg.textContent="The letter generator is not ready. Refresh the page and try again.";msg.classList.add("err");return}
  if(window.uwnFromCalc(ty,list)){const b=document.querySelector('#toolNav [data-tool="letters"]');if(b)b.click()}}

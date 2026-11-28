@@ -504,7 +504,7 @@ body.lk #pcApp{display:none!important}
 @media (max-width:700px){.gs-chip{top:8px;right:8px;font-size:11px;padding:3px 10px}}
 @media (prefers-reduced-motion:reduce){.gs-bar i{animation:none;left:0;width:100%;opacity:.6}}
 </style></head><body class="lk">
-<div class="gs-bar" id="gsBar" role="progressbar" aria-label="Loading from Google Sheets" hidden><i></i></div><div class="gs-chip" id="gsChip" role="status" aria-live="polite" hidden>Loading from Google Sheets\u2026</div>
+<div class="gs-bar" id="gsBar" role="progressbar" aria-label="Loading from Google Sheets" hidden><i></i></div><div class="gs-chip" id="gsChip" role="status" aria-live="polite" hidden>Loading from Google Sheets&hellip;</div>
 <script>
 /* shows the loading line while any request to Google Sheets (Apps Script) is still running, for every tool that uses it */
 (function(){const bar=document.getElementById("gsBar"),chip=document.getElementById("gsChip");let n=0,tm=0;
@@ -2331,7 +2331,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
   setTimeout(()=>location.reload(),rm?500:1900);
  });
 })();
-try{const APP_VER="v3.0.195";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
+try{const APP_VER="v3.0.196";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
 /* v3.0.108: restore the last draft after a refresh */
 try{if(PREV){const d=safeParse(PREV);if(d&&typeof d=="object"){Object.assign(S,d);S.pick=true;if(S.rt=="B.S. No."||S.rt=="O.R. No.")S.rt="A.R. No.";form();render()}}}catch(e){}
 </script>

@@ -4,7 +4,7 @@ A single-file web tool (`index.html`) for 1CISP Underwriting Analysts (UAs) to p
 
 Developed by Daigo. © 2026 Daigo. All rights reserved.
 
-**Current version:** v3.0.199
+**Current version:** v3.0.200
 
 ## Tools
 
@@ -170,4 +170,4 @@ Letter Generator (v3.0.179): on screens wider than 1280 px the form takes half t
 Premium calculator and Masterlist Generator (v3.0.180): on screens wider than 1100 px the boxes sit side by side (Rates and settings next to Summary; masterlist details next to the paste box).
 Letter form (v3.0.181): on screens wider than 1280 px the single-field boxes sit in two columns; checkboxes, text areas and sections stay full width, and an odd field out takes the full row.
 
-- **Loading line:** while any tool is waiting for Google Sheets (the Premium calculator rates, commission matrix, Summary Reports, Directory, saving in the Administrator panel), a thin moving line shows at the top of the page with the note "Loading from Google Sheets…". It appears after a quarter of a second, so quick requests do not flash it, and disappears when the last request finishes.
+- **Loading block:** while any tool is waiting for Google Sheets (the Premium calculator rates, commission matrix, Summary Reports, Directory, saving in the Administrator panel), a blue block with a moving fill and a percentage ("Loading from Google Sheets… 45%") shows. In the two Summary Reports it sits in the sheet card where the loading note was; everywhere else it shows across the top of the page. Google gives no real progress, so the percentage is worked out from the requests that are finished and the time the running ones have taken; it never goes back and reaches 100% when the last one is done.

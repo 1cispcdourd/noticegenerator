@@ -553,7 +553,7 @@ body.lk #pcApp{display:none!important}
 <p class="sr-mut" style="margin:8px 0 0">The Google Sheet links are saved by the Administrator.</p><div class="sr-row" style="margin-top:10px" hidden><label>Name (e.g. FICCO 2027)<input type="text" id="srNm" maxlength="40"></label><label>Google Sheet link<input type="text" id="srLk" class="sr-lk" placeholder="https://docs.google.com/spreadsheets/d/..."></label><button type="button" class="sr-b" id="srAdd">Save sheet</button></div>
 <div id="srMsg" class="sr-msg"></div></div>
 <div class="sr-card"><div class="sr-row">
-<label>View<select id="srView"><option value="plan">Per plan name</option><option value="ua">Overall (by UA)</option><option value="br">Per branch</option></select></label>
+<label>View<select id="srView"><option value="plan">Per plan name</option><option value="ua">By all UA</option><option value="br">Per branch</option></select></label>
 <label>UA<select id="srUA"></select></label><label>Plan<select id="srPlan"></select></label><label>Branch<select id="srBr"><option value="*">All branches</option></select></label>
 <label>Month<select id="srMon"></select></label>
 <label>S.I / C.R status<select id="srSt"><option value="*">All</option><option value="nosi">No S.I</option><option value="nocr">No C.R</option><option value="ok">S.I and C.R received</option></select></label></div></div>
@@ -575,7 +575,7 @@ body.lk #pcApp{display:none!important}
 <label>Google Sheet link<input type="text" id="ocLk" class="sr-lk" placeholder="https://docs.google.com/spreadsheets/d/..."></label><button type="button" class="sr-b" id="ocAdd">Save sheet</button></div>
 <div id="ocMsg" class="sr-msg"></div></div>
 <div class="sr-card"><div class="sr-row">
-<label>View<select id="ocView"><option value="plan">Per plan name</option><option value="coop">Per coop</option><option value="mkt">Per marketing</option><option value="reg">Per region</option><option value="ua">Per UA</option></select></label>
+<label>View<select id="ocView"><option value="plan">Per plan name</option><option value="coop">Per coop</option><option value="mkt">Per marketing</option><option value="reg">Per region</option><option value="ua">By all UA</option></select></label>
 <label>Region<select id="ocReg"></select></label><label>UA<select id="ocUa"></select></label><label>Marketing<select id="ocMk"></select></label><label>Plan<select id="ocPlan"></select></label>
 <label>Year<select id="ocYr"></select></label><label>Month<select id="ocMon"></select></label></div></div>
 <div id="ocKpi" class="sr-kpi"></div><div id="ocTbl"></div>
@@ -2331,7 +2331,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
   setTimeout(()=>location.reload(),rm?500:1900);
  });
 })();
-try{const APP_VER="v3.0.198";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
+try{const APP_VER="v3.0.199";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
 /* v3.0.108: restore the last draft after a refresh */
 try{if(PREV){const d=safeParse(PREV);if(d&&typeof d=="object"){Object.assign(S,d);S.pick=true;if(S.rt=="B.S. No."||S.rt=="O.R. No.")S.rt="A.R. No.";form();render()}}}catch(e){}
 </script>
@@ -3355,7 +3355,7 @@ function render(){const d=DATA[$("#srSrc").value];if(!d)return;mirror();
  const mon=$("#srMon").value,rows=sel(rowsOf(d)).filter(r=>mon==="*"||r[3]===+mon),T=sum(rows);
  $("#srKpi").innerHTML=[["Total net premium",n2(T.P)],["Total female",n0(T.F)],["Total male",n0(T.M)],["Total members",n0(T.M+T.F)],["Total premium adjustments",n2(T.A)]].concat(xk(d,rows,mon)).map(k=>'<div class="sr-k"><span>'+k[0]+"</span><b>"+k[1]+"</b></div>").join("");
  const vw=$("#srView").value,byUA=vw==="ua",byBr=vw==="br",g={};(byBr?sel(dconv(d,$("#srBr").value)).filter(r=>mon==="*"||r[3]===+mon):rows).forEach(r=>{const k=byBr?r[8]:byUA?r[0]:r[1];(g[k]=g[k]||[]).push(r)});
- const body=Object.keys(g).map(k=>[k,sum(g[k])]).sort((a,b)=>b[1].P-a[1].P).map(([k,s])=>"<tr><td>"+E(k)+(byUA&&NAMES[k]?' <span class="sr-mut">'+E(NAMES[k])+"</span>":"")+"</td><td>"+n0(s.M)+"</td><td>"+n0(s.F)+"</td><td>"+n0(s.M+s.F)+"</td><td>"+n2(s.P)+"</td><td>"+n2(s.A)+"</td></tr>").join("");
+ const body=Object.keys(g).map(k=>[k,sum(g[k])]).sort((a,b)=>b[1].P-a[1].P).map(([k,s])=>"<tr><td>"+E(byUA?(NAMES[k]||k):k)+"</td><td>"+n0(s.M)+"</td><td>"+n0(s.F)+"</td><td>"+n0(s.M+s.F)+"</td><td>"+n2(s.P)+"</td><td>"+n2(s.A)+"</td></tr>").join("");
  $("#srTbl").innerHTML='<div class="sr-wrap"><table><thead><tr><th>'+(byBr?"Branch":byUA?"UA":"Plan name")+"</th><th>Male</th><th>Female</th><th>Members</th><th>Net premium</th><th>Premium adjustments</th></tr></thead><tbody>"+(body||'<tr><td colspan="6">No data for this selection.</td></tr>')+'<tr class="sr-t"><td>Total</td><td>'+n0(T.M)+"</td><td>"+n0(T.F)+"</td><td>"+n0(T.M+T.F)+"</td><td>"+n2(T.P)+"</td><td>"+n2(T.A)+"</td></tr></tbody></table></div>"+(($("#srBr").value!=="*"||byBr)&&d.det&&!hasX(d)?'<p class="sr-mut">Totals per branch need the Google Apps Script v3.0.188: paste it and deploy a new version. Until then the cards and table above are not filtered by branch.</p>':"")+(d.bad?'<p class="sr-mut">'+d.bad+" cell(s) with a sheet error (#REF!, #VALUE!) were counted as 0.</p>":"")+'<p class="sr-mut">Updated '+d.at.toLocaleTimeString()+"</p>";
  $("#srDet").innerHTML=detHtml(d,mon);$("#srDep").innerHTML=depHtml(d,mon);compare(d)}
 function compare(d){compare0(d);saveC()}

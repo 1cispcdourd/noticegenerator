@@ -553,12 +553,12 @@ body.lk #pcApp{display:none!important}
 <p class="sr-mut" style="margin:8px 0 0">The Google Sheet links are saved by the Administrator.</p><div class="sr-row" style="margin-top:10px" hidden><label>Name (e.g. FICCO 2027)<input type="text" id="srNm" maxlength="40"></label><label>Google Sheet link<input type="text" id="srLk" class="sr-lk" placeholder="https://docs.google.com/spreadsheets/d/..."></label><button type="button" class="sr-b" id="srAdd">Save sheet</button></div>
 <div id="srMsg" class="sr-msg"></div></div>
 <div class="sr-card"><div class="sr-row">
-<label>View<select id="srView"><option value="plan">Per plan name</option><option value="ua">Overall (by UA)</option></select></label>
-<label>UA<select id="srUA"></select></label><label>Plan<select id="srPlan"></select></label>
+<label>View<select id="srView"><option value="plan">Per plan name</option><option value="ua">Overall (by UA)</option><option value="br">Per branch</option></select></label>
+<label>UA<select id="srUA"></select></label><label>Plan<select id="srPlan"></select></label><label>Branch<select id="srBr"><option value="*">All branches</option></select></label>
 <label>Month<select id="srMon"></select></label>
 <label>S.I / C.R status<select id="srSt"><option value="*">All</option><option value="nosi">No S.I</option><option value="nocr">No C.R</option><option value="ok">S.I and C.R received</option></select></label></div></div>
 <div id="srKpi" class="sr-kpi"></div><div id="srTbl"></div>
-<h2>S.I and C.R monitoring</h2><div class="sr-card"><div class="sr-row"><label>Year (saved sheet)<select id="srYr"></select></label><label>Month<select id="srMo2"></select></label><label>Branch<select id="srBr"><option value="*">All branches</option></select></label><label>Search S.I No., C.R No., branch, plan or UA<input type="search" id="srQ" maxlength="40" placeholder="e.g. 94843, 9936 or AGUINALDO" autocomplete="off"></label></div></div><div id="srDet"></div>
+<h2>S.I and C.R monitoring</h2><div class="sr-card"><div class="sr-row"><label>Year (saved sheet)<select id="srYr"></select></label><label>Month<select id="srMo2"></select></label><label>Search S.I No., C.R No., branch, plan or UA<input type="search" id="srQ" maxlength="40" placeholder="e.g. 94843, 9936 or AGUINALDO" autocomplete="off"></label></div></div><div id="srDet"></div>
 <h2>Deposits per month</h2><div id="srDep"></div>
 <h2>Comparison</h2><div class="sr-card"><div class="sr-row">
 <label>Measure<select id="srMet"><option value="P">Net premium</option><option value="X">Members (M + F)</option><option value="F">Female</option><option value="M">Male</option><option value="A">Premium adjustments</option></select></label>
@@ -2331,7 +2331,7 @@ F.addEventListener("change",e=>{if(e.target.id!="clrs")return;const c=S.cl,v=e.t
   setTimeout(()=>location.reload(),rm?500:1900);
  });
 })();
-try{const APP_VER="v3.0.197";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
+try{const APP_VER="v3.0.198";document.title="Underwriting Processing Tool "+APP_VER;const lv=document.getElementById("lgVer");if(lv)lv.textContent=APP_VER}catch(e){}
 /* v3.0.108: restore the last draft after a refresh */
 try{if(PREV){const d=safeParse(PREV);if(d&&typeof d=="object"){Object.assign(S,d);S.pick=true;if(S.rt=="B.S. No."||S.rt=="O.R. No.")S.rt="A.R. No.";form();render()}}}catch(e){}
 </script>
@@ -3328,6 +3328,10 @@ function filters(d){opts($("#srUA"),[["*","All UAs"]].concat(d.uas.map(u=>[u,NAM
  const ms=[...new Set(d.rows.map(r=>r[3]))].sort((a,b)=>a-b);opts($("#srMon"),[["*","Whole year"]].concat(ms.map(m=>[String(m),MN[m-1]])),1);
  const brs=[...new Set((d.det||[]).map(r=>String(r[1]||"").trim().toUpperCase()).filter(Boolean))].sort();opts($("#srBr"),[["*","All branches"]].concat(brs.map(b=>[b,b])),1)}
 const sel=rs=>{const u=$("#srUA").value,p=$("#srPlan").value;return rs.filter(r=>(u==="*"||r[0]===u)&&(p==="*"||r[1]===p))};
+// branch lines (d.det) as summary rows [ua, plan, year, month, male, female, premium, adjustments, branch]; male / female / adjustments need script v3.0.188
+const hasX=d=>!!(d&&d.det&&d.det.length&&d.det[0].length>=13);
+const dconv=(d,b)=>(d.det||[]).filter(r=>!b||b==="*"||String(r[1]||"").trim().toUpperCase()===b).map(r=>[r[0],r[2],r[3],r[4],r[10]||0,r[11]||0,r[5]||0,r[12]||0,String(r[1]||"").trim().toUpperCase()]);
+const rowsOf=d=>{const b=$("#srBr").value;return(b&&b!=="*"&&hasX(d))?dconv(d,b):d.rows};
 const sum=rs=>rs.reduce((a,r)=>{a.M+=r[4];a.F+=r[5];a.P+=r[6];a.A+=r[7];return a},{M:0,F:0,P:0,A:0});
 const pc=(a,b)=>{if(a==null||!b)return"";const p=(a-b)/Math.abs(b)*100;return'<span class="'+(p>=0?"up":"dn")+'">'+(p>=0?"+":"")+p.toFixed(1)+"%</span>"};
 const fd=s=>{const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(s||"");return m?(+m[3])+" "+MN[+m[2]-1]+" "+m[1]:E(s||"")};
@@ -3348,15 +3352,15 @@ function depHtml(d,mon){if(!d.dep)return"";const u=$("#srUA").value,dl=a=>!a||!a
  +'<p class="sr-mut">A single date means the UA entered one date for the whole month; different dates show as first \u2013 last. Date received by UA is the \u201cDate received S.I from treasury\u201d column.</p>'}
 function mirror(){const a=$("#srSrc"),b=$("#srYr"),c=$("#srMon"),e=$("#srMo2");if(b){b.innerHTML=a.innerHTML;b.value=a.value}if(e){e.innerHTML=c.innerHTML;e.value=c.value}}
 function render(){const d=DATA[$("#srSrc").value];if(!d)return;mirror();
- const mon=$("#srMon").value,rows=sel(d.rows).filter(r=>mon==="*"||r[3]===+mon),T=sum(rows);
+ const mon=$("#srMon").value,rows=sel(rowsOf(d)).filter(r=>mon==="*"||r[3]===+mon),T=sum(rows);
  $("#srKpi").innerHTML=[["Total net premium",n2(T.P)],["Total female",n0(T.F)],["Total male",n0(T.M)],["Total members",n0(T.M+T.F)],["Total premium adjustments",n2(T.A)]].concat(xk(d,rows,mon)).map(k=>'<div class="sr-k"><span>'+k[0]+"</span><b>"+k[1]+"</b></div>").join("");
- const byUA=$("#srView").value==="ua",g={};rows.forEach(r=>{const k=byUA?r[0]:r[1];(g[k]=g[k]||[]).push(r)});
+ const vw=$("#srView").value,byUA=vw==="ua",byBr=vw==="br",g={};(byBr?sel(dconv(d,$("#srBr").value)).filter(r=>mon==="*"||r[3]===+mon):rows).forEach(r=>{const k=byBr?r[8]:byUA?r[0]:r[1];(g[k]=g[k]||[]).push(r)});
  const body=Object.keys(g).map(k=>[k,sum(g[k])]).sort((a,b)=>b[1].P-a[1].P).map(([k,s])=>"<tr><td>"+E(k)+(byUA&&NAMES[k]?' <span class="sr-mut">'+E(NAMES[k])+"</span>":"")+"</td><td>"+n0(s.M)+"</td><td>"+n0(s.F)+"</td><td>"+n0(s.M+s.F)+"</td><td>"+n2(s.P)+"</td><td>"+n2(s.A)+"</td></tr>").join("");
- $("#srTbl").innerHTML='<div class="sr-wrap"><table><thead><tr><th>'+(byUA?"UA":"Plan name")+"</th><th>Male</th><th>Female</th><th>Members</th><th>Net premium</th><th>Premium adjustments</th></tr></thead><tbody>"+(body||'<tr><td colspan="6">No data for this selection.</td></tr>')+'<tr class="sr-t"><td>Total</td><td>'+n0(T.M)+"</td><td>"+n0(T.F)+"</td><td>"+n0(T.M+T.F)+"</td><td>"+n2(T.P)+"</td><td>"+n2(T.A)+"</td></tr></tbody></table></div>"+(d.bad?'<p class="sr-mut">'+d.bad+" cell(s) with a sheet error (#REF!, #VALUE!) were counted as 0.</p>":"")+'<p class="sr-mut">Updated '+d.at.toLocaleTimeString()+"</p>";
+ $("#srTbl").innerHTML='<div class="sr-wrap"><table><thead><tr><th>'+(byBr?"Branch":byUA?"UA":"Plan name")+"</th><th>Male</th><th>Female</th><th>Members</th><th>Net premium</th><th>Premium adjustments</th></tr></thead><tbody>"+(body||'<tr><td colspan="6">No data for this selection.</td></tr>')+'<tr class="sr-t"><td>Total</td><td>'+n0(T.M)+"</td><td>"+n0(T.F)+"</td><td>"+n0(T.M+T.F)+"</td><td>"+n2(T.P)+"</td><td>"+n2(T.A)+"</td></tr></tbody></table></div>"+(($("#srBr").value!=="*"||byBr)&&d.det&&!hasX(d)?'<p class="sr-mut">Totals per branch need the Google Apps Script v3.0.188: paste it and deploy a new version. Until then the cards and table above are not filtered by branch.</p>':"")+(d.bad?'<p class="sr-mut">'+d.bad+" cell(s) with a sheet error (#REF!, #VALUE!) were counted as 0.</p>":"")+'<p class="sr-mut">Updated '+d.at.toLocaleTimeString()+"</p>";
  $("#srDet").innerHTML=detHtml(d,mon);$("#srDep").innerHTML=depHtml(d,mon);compare(d)}
 function compare(d){compare0(d);saveC()}
 function compare0(d){const m=$("#srMet").value,dec=MET[m][1],cid=$("#srCmp").value,c=cid&&DATA[cid],A=Array(12).fill(null),B=Array(12).fill(null);
- sel(d.rows).forEach(r=>{A[r[3]-1]=(A[r[3]-1]||0)+val(r,m)});if(c)sel(c.rows).forEach(r=>{B[r[3]-1]=(B[r[3]-1]||0)+val(r,m)});
+ sel(rowsOf(d)).forEach(r=>{A[r[3]-1]=(A[r[3]-1]||0)+val(r,m)});if(c)sel(rowsOf(c)).forEach(r=>{B[r[3]-1]=(B[r[3]-1]||0)+val(r,m)});
  const f=v=>v==null?"–":dec?n2(v):n0(v);let h='<div class="sr-wrap"><table><thead><tr><th>Month</th><th>'+E(lab($("#srSrc").value))+"</th><th>vs previous month</th>"+(c?"<th>"+E(lab(cid))+"</th><th>Difference</th>":"")+"</tr></thead><tbody>",ta=0,tb=0;
  for(let i=0;i<12;i++){if(A[i]==null&&B[i]==null)continue;ta+=A[i]||0;tb+=B[i]||0;h+="<tr><td>"+MN[i]+"</td><td>"+f(A[i])+"</td><td>"+(i&&A[i-1]!=null?pc(A[i],A[i-1]):"")+"</td>"+(c?"<td>"+f(B[i])+"</td><td>"+(A[i]!=null&&B[i]!=null?pc(A[i],B[i]):"")+"</td>":"")+"</tr>"}
  $("#srCmpT").innerHTML=h+'<tr class="sr-t"><td>Total</td><td>'+f(ta)+"</td><td></td>"+(c?"<td>"+f(tb)+"</td><td>"+pc(ta,tb)+"</td>":"")+"</tr></tbody></table></div>"+(c?'<p class="sr-mut">Year to year compares the same months that have data in both sheets (a total includes every month shown).</p>':"")}

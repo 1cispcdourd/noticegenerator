@@ -496,26 +496,21 @@ body.lk #pcApp{display:none!important}
 /* v3.0.179: Letter Generator form takes half the page, preview the other half */
 @media screen and (min-width:1281px){.app{grid-template-columns:1fr 1fr}}
 /* blue loading block with a percentage, while any tool is waiting for Google Sheets */
-.gs-bar,.gs-blk{position:relative;height:30px;border-radius:8px;overflow:hidden;background:#7ea6e8;color:#fff;font:700 13px/30px system-ui,Segoe UI,Arial,sans-serif}
-.gs-bar{position:fixed;left:0;right:0;top:0;height:34px;line-height:34px;border-radius:0;z-index:2147483000;box-shadow:0 2px 10px rgba(0,0,0,.3)}
-.gs-bar[hidden]{display:none}
+.gs-blk{position:relative;height:30px;border-radius:8px;overflow:hidden;background:#7ea6e8;color:#fff;font:700 13px/30px system-ui,Segoe UI,Arial,sans-serif}
 .gs-blk{max-width:640px;margin:6px 0}
-.gs-bar i,.gs-blk i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .25s ease;background:repeating-linear-gradient(45deg,#0b3d91 0 12px,#1557b0 12px 24px);background-size:34px 34px;animation:gsstripe 1s linear infinite}
+.gs-blk i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .25s ease;background:repeating-linear-gradient(45deg,#0b3d91 0 12px,#1557b0 12px 24px);background-size:34px 34px;animation:gsstripe 1s linear infinite}
 @keyframes gsstripe{to{background-position:34px 0}}
-.gs-bar span,.gs-blk span{position:relative;display:block;padding:0 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.5)}
-@media (prefers-reduced-motion:reduce){.gs-bar i,.gs-blk i{animation:none}}
+.gs-blk span{position:relative;display:block;padding:0 14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+@media (prefers-reduced-motion:reduce){.gs-blk i{animation:none}}
 </style></head><body class="lk">
-<div class="gs-bar" id="gsBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Loading from Google Sheets" hidden><i></i><span></span></div>
 <script>
-/* Loading block with a percentage for every request to Google Sheets (Apps Script). The percentage is worked out from the requests that are
+/* Loading block with a percentage in the Summary Report cards while they wait for Google Sheets (Apps Script). The percentage is worked out from the requests that are
    finished and the time the running ones have taken (Google gives no real progress), never goes back, and reaches 100% when the last one is done. */
-(function(){const bar=document.getElementById("gsBar"),fill=bar.querySelector("i"),lab=bar.querySelector("span"),inl=new Map();
+(function(){const inl=new Map();
  let reqs=new Map(),seq=0,total=0,done=0,planned=0,shown=0,fin=false,t0=0,tick=0,finTm=0,planTm=0;
  const part=t=>Math.min(.9,1-Math.exp(-t/5000)),active=()=>reqs.size>0||planned>0;
  const calc=()=>{if(!total)return 0;let p=done;const n=Date.now();reqs.forEach(s=>{p+=part(n-s)});return Math.min(99,Math.floor(100*p/total))};
- const paint=()=>{const T=" "+shown+"%";fill.style.width=shown+"%";lab.textContent="Loading from Google Sheets\u2026"+T;bar.setAttribute("aria-valuenow",shown);
-  inl.forEach(e=>{e.f.style.width=shown+"%";e.l.textContent=e.m+T;e.b.setAttribute("aria-valuenow",shown)});
-  bar.hidden=!(active()||fin)||inl.size>0||(!fin&&Date.now()-t0<200)};
+ const paint=()=>{const T=" "+shown+"%";inl.forEach(e=>{e.f.style.width=shown+"%";e.l.textContent=e.m+T;e.b.setAttribute("aria-valuenow",shown)})};
  const upd=()=>{if(active())shown=Math.max(shown,calc());paint()};
  const run=()=>{if(!tick)tick=setInterval(()=>{upd();if(!active()&&!fin){clearInterval(tick);tick=0}},150)};
  const newBatch=()=>{clearTimeout(finTm);fin=false;total=0;done=0;planned=0;shown=0;t0=Date.now()};
